@@ -1,0 +1,8 @@
+services:
+  dhis.dhis_login:
+    class: Drupal\dhis\Services\DhisLogin
+    arguments: ['@config.factory']
+
+  dhis.orgunit:
+    class: Drupal\dhis\Services\OrgUnitService
+    arguments: ['@dhis.dhis_login']

@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Contains dhis.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function dhis_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the dhis module.
+    case 'help.page.dhis':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('DHIS2 Module for connecting and retrieving metadata from a DHIS2 Instance') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function dhis_theme() {
+  return [
+    'dhis' => [
+      'template' => 'dhis',
+      'variables' => array('test_var' => 'Michael'),
+    ],
+  ];
+}

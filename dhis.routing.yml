@@ -1,0 +1,15 @@
+dhis.settings:
+  path: '/dhis/settings'
+  defaults:
+    _form: '\Drupal\dhis\Form\DhisSettings'
+    _title: 'DHIS2 Settings'
+  requirements:
+    _permission: 'administer site configuration'
+
+dhis.display:
+  path: '/dhis/display'
+  defaults:
+    _controller: '\Drupal\dhis\Controller\DhisController::display'
+    _title: 'Dhis2 Metadata'
+  requirements:
+    _permission: 'access content'
