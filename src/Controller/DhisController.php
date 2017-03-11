@@ -17,10 +17,9 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
   }
 
   public function display(){
-    $orgUnitService = \Drupal::service('dhis.orgunit');
-    $content = $orgUnitService->getOrgUnitGroups(FALSE);
-    $data = json_decode($content, TRUE);
-    drupal_set_message($data['organisationUnitGroups'][0]['code']);
+
+
+
     $config = $this->config_factory->getEditable('dhis.settings');
     $orgUnitGrp = $config->get('dhis.orgUnitGrp');
     $orgUnits = $config->get('dhis.orgUnits');
@@ -28,29 +27,39 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     $indicators = $config->get('dhis.indicators');
 
     if ($orgUnitGrp == 1){
+      $orgUnitService = \Drupal::service('dhis.orgunit');
+      $content = $orgUnitService->getOrgUnitGroups(FALSE);
+      $voc = Vocabulary::create(['name' => 'Organisation Units Group', 'vid' => 'Organisation_Units_Group',
+        'description' => 'A group of similar Organisation Unit Types',])->save();
+      $data = json_decode($content, TRUE);
+      drupal_set_message($voc);
       drupal_set_message(' grp '.$orgUnitGrp);
+      /*foreach ($data as $value){
+        foreach ($value as $key => $item){
+          drupal_set_message($item['id'].' - '.$item['displayName']);
+          $term = Vocabulary::create([
+            'name' => $item['displayName'],
+            'vid' => $item['id'],
+          ])->delete();//->save();
+        }
+      }*/
+
     }
+
     if ($orgUnits == 1){
       drupal_set_message(' units '.$orgUnits);
     }
+
     if($dataElements == 1){
+      $dataElementService = \Drupal::service('dhis.dataelement');
+      $content = $dataElementService->getDataElements(FALSE);
+      $data = json_decode($content, TRUE);
       drupal_set_message('de '.$dataElements);
     }
+
     if($indicators == 1){
       drupal_set_message('ind '.$indicators);
     }
-
-
-    /*foreach ($data as $value){
-      foreach ($value as $key => $item){
-        drupal_set_message($item['id'].' - '.$item['displayName']);
-        $term = Vocabulary::create([
-          'name' => $item['displayName'],
-          'vid' => $item['id'],
-        ])->delete();//->save();
-      }
-
-    }*/
     $element = [
       '#theme' => 'dhis',
       '#test_var' => $this->t($content)
@@ -61,5 +70,13 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     return new static(
       $container->get('config.factory')
     );
+  }
+  private function createVocabulary($data){
+    foreach ($data as $value) {
+      foreach ($value as $key => $item) {
+        drupal_set_message($item['id'] . ' - ' . $item['displayName']);
+        $term = Vocabulary::create(['name' => $item['displayName'], 'vid' => $item['id'],])->delete();//->save();
+      }
+    }
   }
 }

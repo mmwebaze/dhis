@@ -6,3 +6,7 @@ services:
   dhis.orgunit:
     class: Drupal\dhis\Services\OrgUnitService
     arguments: ['@dhis.dhis_login']
+
+  dhis.dataelement:
+    class: Drupal\dhis\Services\DataElementService
+    arguments: ['@dhis.dhis_login']
