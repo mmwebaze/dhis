@@ -30,7 +30,7 @@ function dhis_theme() {
   return [
     'dhis' => [
       'template' => 'dhis',
-      'variables' => array('test_var' => 'Michael'),
+      'variables' => array('test_var' => NULL),
     ],
   ];
 }

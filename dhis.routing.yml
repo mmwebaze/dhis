@@ -10,7 +10,7 @@ dhis.display:
   path: '/dhis/display'
   defaults:
     _controller: '\Drupal\dhis\Controller\DhisController::display'
-    _title: 'Dhis2 Fetch Metadata'
+    _title: 'Dhis2 Data Display'
   requirements:
     _permission: 'access content'
 

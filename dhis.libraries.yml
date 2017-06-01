@@ -1,0 +1,4 @@
+dhis:
+  css:
+    theme:
+      css/dhis.css: {}

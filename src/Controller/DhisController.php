@@ -18,6 +18,7 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
   }
 
   public function display(){
+    $form = \Drupal::formBuilder()->getForm('Drupal\dhis\Form\VisualizerForm');
 
     $vids = Vocabulary::loadMultiple();
 
@@ -34,10 +35,12 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
         }
       }
     }
+    $this->content['form'] = $form;
 
    $element = [
       '#theme' => 'dhis',
-      '#test_var' => $this->content
+      '#test_var' => $this->content,
+       '#my_form' => $form
     ];
     return $element;
   }
