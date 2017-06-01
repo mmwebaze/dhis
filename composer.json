@@ -10,5 +10,7 @@
     "issues": "https://www.drupal.org/project/issues/dhis",
     "source": "http://cgit.drupalcode.org/dhis"
   },
-  "require": { }
+  "require": {
+    "guzzlehttp/guzzle": "^6.2@dev"
+  }
 }

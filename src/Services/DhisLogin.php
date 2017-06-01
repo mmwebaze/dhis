@@ -7,6 +7,7 @@
 namespace Drupal\dhis\Services;
 
 use Drupal\Core\Config\ConfigFactory;
+use GuzzleHttp\Client;
 
 class DhisLogin implements LoginService {
 
@@ -26,23 +27,10 @@ class DhisLogin implements LoginService {
 
   public function login($url){
     drupal_set_message($this->baseUrl.$url);
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL,$this->baseUrl.$url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $this->header);
-    curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_setopt($ch, CURLOPT_USERPWD, $this->username.':'.$this->password);
-    #curl_setopt($ch, CURLOPT_URL,$url);
+    $client = new Client();
+    $response = $client->request('GET', $this->baseUrl.$url,['auth' =>[$this->username,$this->password]]);
 
-    $result = curl_exec($ch);
-    $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    //$r = var_dump(json_decode($result));
-    #print($r);
-
-    //return json_decode($result, true);
-
-    return $result;
+    return json_decode($response->getBody()->getContents(), true);
   }
 
   private function setHeaders($username, $password){

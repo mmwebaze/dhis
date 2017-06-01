@@ -13,3 +13,11 @@ dhis.display:
     _title: 'Dhis2 Fetch Metadata'
   requirements:
     _permission: 'access content'
+
+dhis.metadata_fetch:
+  path: '/dhis/metadatafetch'
+  defaults:
+    _form: '\Drupal\dhis\Form\MetadataExtractForm'
+    _title: 'Dhis2 Metadata Fetch'
+  requirements:
+    _permission: 'administer site configuration'

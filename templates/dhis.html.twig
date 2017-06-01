@@ -1,18 +1,10 @@
-{#
-/**
- * @file dhis.html.twig
- * Default theme implementation to present Dhis data.
- *
- * This template is used when viewing Dhis pages.
- *
- *
- * Available variables:
- * - content: A list of content items. Use 'content' to print all content, or
- * - attributes: HTML attributes for the container element.
- *
- * @see template_preprocess_dhis()
- *
- * @ingroup themeable
- */
-#}
-<p>Org Units: {{ test_var }}</p>
+<select name="dataelements">
+    {% for key,value in test_var.dhis_data_elements %}
+        <option value={{ key }}>{{ value }}</option>
+    {% endfor %}
+</select >
+<select name="orgunits">
+    {% for key,value in test_var.dhis_organisation_units %}
+            <option value={{ key }}>{{ value }}</option>
+    {% endfor %}
+</select >

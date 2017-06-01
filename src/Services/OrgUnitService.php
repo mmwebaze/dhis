@@ -30,6 +30,7 @@ class OrgUnitService implements OrgUnitServiceInterface
     {
         //$format = $this->verifyFormat($format);
         $orgUnitEndPoint = $this->orgUnitEndPoint.".".Validator::verifyFormat($format)."?fields=id,displayName&paging=".Validator::verifyPagination($isPaginated);
+
         return $this->loginService->login($orgUnitEndPoint);
     }
 
