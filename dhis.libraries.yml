@@ -1,4 +1,6 @@
-dhis:
+dhis_dhis:
   css:
     theme:
       css/dhis.css: {}
+  js:
+    js/dhis.js: {}
