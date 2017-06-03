@@ -20,7 +20,7 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
   public function display(){
     $form = \Drupal::formBuilder()->getForm('Drupal\dhis\Form\VisualizerForm');
 
-    $vids = Vocabulary::loadMultiple();
+    /*$vids = Vocabulary::loadMultiple();
 
     foreach ($vids as $vid){
       $vocabularyId = $vid->id();
@@ -35,12 +35,14 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
         }
       }
     }
+
+    $form['orgUnits']['#options'] = ['1' => 'Taby', '2' => 'Sirabo'];
+    var_dump($form['orgUnits']['#options']);*/
     $this->content['form'] = $form;
 
    $element = [
       '#theme' => 'dhis',
       '#test_var' => $this->content,
-       '#my_form' => $form
     ];
     return $element;
   }

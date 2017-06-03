@@ -29,7 +29,6 @@ class DhisLogin implements LoginService {
     drupal_set_message($this->baseUrl.$url);
     $client = new Client();
     $response = $client->request('GET', $this->baseUrl.$url,['auth' =>[$this->username,$this->password]]);
-
     return json_decode($response->getBody()->getContents(), true);
   }
 

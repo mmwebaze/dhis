@@ -1,12 +1,2 @@
 {{ attach_library('dhis/dhis_dhis') }}
-<select name="dataelements">
-    {% for key,value in test_var.dhis_data_elements %}
-        <option value={{ key }}>{{ value }}</option>
-    {% endfor %}
-</select >
-<select name="orgunits">
-    {% for key,value in test_var.dhis_organisation_units %}
-            <option value={{ key }}>{{ value }}</option>
-    {% endfor %}
-</select >
 {{ test_var.form }}
