@@ -1,0 +1,19 @@
+<?php
+/**
+ * @file
+ * Contains dhis.install
+ */
+
+/**
+ * Implements hook_install.
+ */
+function dhis_install(){
+
+}
+
+/**
+ * Implements hook_uninstall.
+ */
+function dhis_uninstall(){
+
+}
