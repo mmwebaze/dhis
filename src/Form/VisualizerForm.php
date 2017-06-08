@@ -13,6 +13,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class VisualizerForm extends FormBase {
   private $entity_manager;
   private $dhis_analytics;
+  private $analyticsData;
+
   public function __construct(EntityTypeManager $entity_manager, AnalyticService $dhis_analytics) {
     $this->entity_manager = $entity_manager;
     $this->dhis_analytics = $dhis_analytics;
@@ -39,6 +41,7 @@ class VisualizerForm extends FormBase {
       '#type' => 'submit',
       '#value' => t('View graph'),
     );
+    $form['#attached']['library'][] = 'dhis/dhis_dhis';
 
     return $form;
   }
@@ -51,8 +54,10 @@ class VisualizerForm extends FormBase {
     $dx = ['hfdmMSPBgLG'];
     $ou = ['ImspTQPwCqd'];
     $pe = ['THIS_YEAR'];
-    $analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
-    drupal_set_message('Michael Mwebaze');
+    $this->analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
+
+    //print(serialize($_POST($analyticsData)));
+    //$form_state['storage']['data'] = $analyticsData;
   }
   private function getTaxonomyTerms(){
     $content = [];

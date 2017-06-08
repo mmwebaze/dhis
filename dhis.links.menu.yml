@@ -1,0 +1,28 @@
+
+# Organisation unit menu items definition
+entity.organisation_unit.collection:
+  title: 'Organisation unit list'
+  route_name: entity.organisation_unit.collection
+  description: 'List Organisation unit entities'
+  parent: system.admin_structure
+  weight: 100
+
+organisation_unit.admin.structure.settings:
+  title: Organisation unit settings
+  description: 'Configure Organisation unit entities'
+  route_name: organisation_unit.settings
+  parent: system.admin_structure
+
+# Data element menu items definition
+entity.data_element.collection:
+  title: 'Data element list'
+  route_name: entity.data_element.collection
+  description: 'List Data element entities'
+  parent: system.admin_structure
+  weight: 100
+
+data_element.admin.structure.settings:
+  title: Data element settings
+  description: 'Configure Data element entities'
+  route_name: data_element.settings
+  parent: system.admin_structure

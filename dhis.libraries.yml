@@ -4,3 +4,5 @@ dhis_dhis:
       css/dhis.css: {}
   js:
     js/dhis.js: {}
+  dependencies:
+      - core/jquery

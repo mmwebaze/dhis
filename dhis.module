@@ -26,7 +26,7 @@ function dhis_help($route_name, RouteMatchInterface $route_match) {
 /**
  * Implements hook_theme().
  */
-function dhis_theme() {
+function dhis_theme($existing, $type, $theme, $path) {
   return [
     'dhis' => [
       'template' => 'dhis',
