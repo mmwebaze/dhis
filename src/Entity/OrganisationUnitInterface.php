@@ -74,4 +74,24 @@ interface OrganisationUnitInterface extends  ContentEntityInterface, EntityChang
    */
   public function setPublished($published);
 
+  /**
+   * Sets the organisation unit uid
+   *
+   * @param $orgunituid
+   *
+   * @return \Drupal\dhis\Entity\OrganisationUnitInterface
+   *
+   */
+  public function setOrgunitUid($orgunituid);
+
+  /**
+   * Returns the Organisation unit uid.
+   *
+   *
+   * @return string
+   *
+   *   uid of the Organisation Unit
+   */
+  public function getOrgunitUid();
+
 }

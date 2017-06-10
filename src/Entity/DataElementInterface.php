@@ -73,5 +73,39 @@ interface DataElementInterface extends  ContentEntityInterface, EntityChangedInt
    *   The called Data element entity.
    */
   public function setPublished($published);
+  /**
+   * Sets the Data element uid.
+   *
+   * @param string $deuid
+   *   The Data element uid.
+   *
+   * @return \Drupal\dhis\Entity\DataElementInterface
+   *   The called Data element entity.
+   */
+  public function setDataElementUid($deuid);
+  /**
+   * Gets the Data element uid.
+   *
+   * @return string
+   *   uid of the Data element.
+   */
+  public function getDataElementUid();
+  /**
+   * Sets the Data element code.
+   *
+   * @param string $decode
+   *   The Data element code.
+   *
+   * @return \Drupal\dhis\Entity\DataElementInterface
+   *   The called Data element entity.
+   */
+  public function setDataElementCode($decode);
+  /**
+   * Gets the Data element code.
+   *
+   * @return string
+   *   code of the Data element.
+   */
+  public function getDataElementCode();
 
 }

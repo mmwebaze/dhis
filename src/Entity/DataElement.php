@@ -182,7 +182,7 @@ class DataElement extends ContentEntityBase implements DataElementInterface {
       ->setLabel(t('Short name'))
       ->setDescription(t('The short name of the Data element entity.'))
       ->setSettings(array(
-        'max_length' => 50,
+        'max_length' => 255,
         'text_processing' => 0,
       ))
       ->setDefaultValue('')
@@ -205,7 +205,12 @@ class DataElement extends ContentEntityBase implements DataElementInterface {
         'max_length' => 50,
         'text_processing' => 0,
       ))
-      ->setReadOnly(TRUE);
+      ->setDisplayOptions('form', array(
+        'type' => 'string_textfield',
+        'weight' => -4,
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['decode'] = BaseFieldDefinition::create('string')
       ->setLabel(t('code'))
@@ -214,7 +219,12 @@ class DataElement extends ContentEntityBase implements DataElementInterface {
         'max_length' => 50,
         'text_processing' => 0,
       ))
-      ->setReadOnly(TRUE);
+      ->setDisplayOptions('form', array(
+        'type' => 'string_textfield',
+        'weight' => -4,
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Publishing status'))
@@ -230,6 +240,24 @@ class DataElement extends ContentEntityBase implements DataElementInterface {
       ->setDescription(t('The time that the entity was last edited.'));
 
     return $fields;
+  }
+
+  public function setDataElementUid($deuid) {
+    $this->set('deuid', $deuid);
+    return $this;
+  }
+
+  public function getDataElementUid() {
+    return $this->get('deuid')->entity;
+  }
+
+  public function setDataElementCode($decode) {
+    $this->set('decode', $decode);
+    return $this;
+  }
+
+  public function getDataElementCode() {
+    return $this->get('decode')->entity;
   }
 
 }

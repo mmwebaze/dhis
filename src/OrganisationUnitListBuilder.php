@@ -22,6 +22,7 @@ class OrganisationUnitListBuilder extends EntityListBuilder {
   public function buildHeader() {
     $header['id'] = $this->t('Organisation unit ID');
     $header['name'] = $this->t('Name');
+    $header['orgunituid'] = $this->t('Org unit uid');
     return $header + parent::buildHeader();
   }
 
@@ -39,6 +40,7 @@ class OrganisationUnitListBuilder extends EntityListBuilder {
         )
       )
     );
+    $row['orgunituid'] = $entity->getOrgunitUid();
     return $row + parent::buildRow($entity);
   }
 

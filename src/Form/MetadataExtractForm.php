@@ -7,6 +7,7 @@ use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\dhis\Entity\OrganisationUnit;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\taxonomy\Entity\Term;
@@ -53,7 +54,8 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
       $orgUnitService = \Drupal::service('dhis.orgunit');
       $this->content = $orgUnitService->getOrgUnits(FALSE);
       $this->content = $this->content['organisationUnits'];
-      $this->createVocabulary($this->content, 'Organisation Units');
+      //$this->createVocabulary($this->content, 'Organisation Units');
+      $this->createEntities($this->content);
       drupal_set_message('Sucessfully pulled organisation units from DHIS2');
     }
 
@@ -61,7 +63,9 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
       $dataElementService = \Drupal::service('dhis.dataelement');
       $this->content = $dataElementService->getDataElements(FALSE);
       $this->content = $this->content['dataElements'];
-      $this->createVocabulary($this->content, 'Data Elements');
+      //$this->createVocabulary($this->content, 'Data Elements');
+      $this->createEntities($this->content);
+      drupal_set_message('Sucessfully pulled Data Elements units from DHIS2');
     }
   }
   public static function create(ContainerInterface $container){
@@ -102,6 +106,13 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
         //'dhis2_uid'.strtolower($vocabularyName) => $item['id']
         'description' => $item['id']
       ])->save();
+    }
+  }
+  private function createEntities($metadata){
+
+    foreach ($metadata as $item){
+      OrganisationUnit::create(['name' => $item['displayName'],
+      'orgunituid' => $item['id']])->save();
     }
   }
 }

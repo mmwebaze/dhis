@@ -141,6 +141,20 @@ class OrganisationUnit extends ContentEntityBase implements OrganisationUnitInte
     $this->set('status', $published ? TRUE : FALSE);
     return $this;
   }
+  /**
+   * {@inheritdoc}
+   */
+  public function setOrgunitUid($orgunituid) {
+    $this->set('orgunituid', $orgunituid);
+    return $this;
+  }
+  /**
+   * {@inheritdoc}
+   */
+  public function getOrgunitUid() {
+    return $this->get('orgunituid')->value;
+  }
+
 
   /**
    * {@inheritdoc}
@@ -200,7 +214,12 @@ class OrganisationUnit extends ContentEntityBase implements OrganisationUnitInte
         'max_length' => 50,
         'text_processing' => 0,
       ))
-      ->setReadOnly(TRUE);
+      ->setDisplayOptions('form', array(
+        'type' => 'string_textfield',
+        'weight' => -4,
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Publishing status'))
