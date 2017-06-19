@@ -56,9 +56,19 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     $ou = ['ImspTQPwCqd'];
     $pe = ['THIS_YEAR'];
     $analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
+    $render_array = [];
 
+      $render_array['rows'] = $analyticsData['rows'];
+      $render_array['dimensions'] = $analyticsData['metaData']['dimensions'];
+    //return new JsonResponse( $analyticsData );
+      drupal_set_message(json_encode($render_array, 1));
 
-    return new JsonResponse( $analyticsData );
+      $element = [
+          '#theme' => 'dhis',
+          '#test_var' => new JsonResponse( $render_array ),
+          //'#test_var' => $render_array,
+      ];
+      return $element;
   }
   public static function create(ContainerInterface $container){
     return new static(

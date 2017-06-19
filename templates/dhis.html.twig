@@ -1,2 +1,7 @@
 {{ attach_library('dhis/dhis_dhis') }}
-{{ test_var.form }}
+{% if test_var.form %}
+    {{ test_var.form }}
+{% endif %}
+{% if test_var %}
+    {{ test_var }}
+{% endif %}

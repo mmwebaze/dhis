@@ -17,7 +17,7 @@ class AnalyticService implements AnalyticServiceInterface {
     $dx = implode(';', $dataElements);
     $ou = implode(';', $orgUnits);
     $pe = implode(';', $periods);
-    $analyticsEndpoint = $this->analyticsEndpoint.'?dimension=dx:'.$dx.'&dimension=ou:'.$ou.'&filter=pe:'.$pe;
+    $analyticsEndpoint = $this->analyticsEndpoint.'?dimension=dx:'.$dx.'&dimension=ou:'.$ou.'&dimension=pe:'.$pe.'&tableLayout=true&rows=dx;ou&columns=pe';
     return $this->loginService->login($analyticsEndpoint);
   }
 }
