@@ -10,16 +10,23 @@ use Drupal\dhis\Services\AnalyticService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use \Drupal\dhis\Util\CsvCreator;
+use Drupal\Core\File\FileSystem;
+use Drupal\Core\Path\CurrentPathStack;
 
 class DhisController extends ControllerBase implements ContainerInjectionInterface {
 
   protected $entity_manager;
   private $content = [];
   private $dhis_analytics;
+    private $file_system;
+    private $path_current;
 
-  public function __construct(EntityTypeManager $entity_manager, AnalyticService $dhis_analytics) {
+  public function __construct(EntityTypeManager $entity_manager, AnalyticService $dhis_analytics, FileSystem $file_system, CurrentPathStack $path_current) {
     $this->entity_manager = $entity_manager;
     $this->dhis_analytics = $dhis_analytics;
+      $this->file_system = $file_system;
+      $this->path_current = $path_current;
   }
 
   public function display(){
@@ -56,24 +63,38 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     $ou = ['ImspTQPwCqd'];
     $pe = ['THIS_YEAR'];
     $analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
-    $render_array = [];
+    $data = [];
 
-      $render_array['rows'] = $analyticsData['rows'];
-      $render_array['dimensions'] = $analyticsData['metaData']['dimensions'];
-    //return new JsonResponse( $analyticsData );
-      drupal_set_message(json_encode($render_array, 1));
+      $data['rows'] = $analyticsData['rows'];
+
+
+      $data['dimensions'] = $analyticsData['metaData']['dimensions'];
+
+      $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Value'];
+      $csvCreator = new CsvCreator($this->file_system);
+      $csvCreator->createCsv($header, $analyticsData['rows']);
+      $output = array(
+          '#theme' => 'table',
+          //'#cache' => ['disabled' => TRUE],
+          '#caption' => 'The table caption / Title'.$this->path_current->getPath(),
+          '#header' => $header,
+          '#rows' => $data['rows'],
+      );
+
+      $data['table'] = $output;
 
       $element = [
           '#theme' => 'dhis',
-          '#test_var' => new JsonResponse( $render_array ),
-          //'#test_var' => $render_array,
+          '#test_var' => $output,
       ];
       return $element;
   }
   public static function create(ContainerInterface $container){
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('dhis_analytics')
+      $container->get('dhis_analytics'),
+        $container->get('file_system'),
+        $container->get('path.current')
     );
   }
 }
