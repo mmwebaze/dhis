@@ -248,7 +248,7 @@ class DataElement extends ContentEntityBase implements DataElementInterface {
   }
 
   public function getDataElementUid() {
-    return $this->get('deuid')->entity;
+    return $this->get('deuid')->value;
   }
 
   public function setDataElementCode($decode) {
@@ -257,7 +257,7 @@ class DataElement extends ContentEntityBase implements DataElementInterface {
   }
 
   public function getDataElementCode() {
-    return $this->get('decode')->entity;
+    return $this->get('decode')->value;
   }
 
 }

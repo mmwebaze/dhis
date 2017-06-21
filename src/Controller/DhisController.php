@@ -5,12 +5,13 @@ namespace Drupal\dhis\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Url;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\dhis\Services\AnalyticService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use \Drupal\dhis\Util\CsvCreator;
+use \Drupal\dhis\Util\CsvHandler;
 use Drupal\Core\File\FileSystem;
 use Drupal\Core\Path\CurrentPathStack;
 
@@ -71,21 +72,24 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
       $data['dimensions'] = $analyticsData['metaData']['dimensions'];
 
       $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Value'];
-      $csvCreator = new CsvCreator($this->file_system);
-      $csvCreator->createCsv($header, $analyticsData['rows']);
+      $csvHandler = new CsvHandler($this->file_system);
+      $csvHandler->createCsv($header, $analyticsData['rows']);
+
       $output = array(
           '#theme' => 'table',
+          '#url' => 'sites/drupal-8-3-1.dd/files/data.csv',
           //'#cache' => ['disabled' => TRUE],
-          '#caption' => 'The table caption / Title'.$this->path_current->getPath(),
+          '#caption' => ' Data pulled',
           '#header' => $header,
           '#rows' => $data['rows'],
       );
 
-      $data['table'] = $output;
+      $this->content['table'] = $output;
+      $this->content['url'] = 'sites/drupal-8-3-1.dd/files/data.csv';
 
       $element = [
           '#theme' => 'dhis',
-          '#test_var' => $output,
+          '#test_var' => $this->content,
       ];
       return $element;
   }

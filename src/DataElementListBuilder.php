@@ -22,6 +22,7 @@ class DataElementListBuilder extends EntityListBuilder {
   public function buildHeader() {
     $header['id'] = $this->t('Data element ID');
     $header['name'] = $this->t('Name');
+      $header['deuid'] = $this->t('de uid');
     return $header + parent::buildHeader();
   }
 
@@ -39,6 +40,7 @@ class DataElementListBuilder extends EntityListBuilder {
         )
       )
     );
+      $row['deuid'] = $entity->getDataElementUid();
     return $row + parent::buildRow($entity);
   }
 
