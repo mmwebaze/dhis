@@ -1,4 +1,8 @@
 <?php
+use Symfony\Component\Yaml\Yaml;
+use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\taxonomy\Entity\Term;
+
 /**
  * @file
  * Contains dhis.install
@@ -8,7 +12,20 @@
  * Implements hook_install.
  */
 function dhis_install(){
+    $module_path = drupal_get_path('module', 'dhis');
+    $file_contents = file_get_contents($module_path.'/dhis.periods.yml');
+    $periods = Yaml::parse($file_contents);
 
+    $vid = 'dhis_period';
+    $vocabulary = Vocabulary::create(['name' => 'Dhis2 Periods', 'vid' => $vid, 'description' => 'DHIS2 Relative Periods'])->save();
+
+    foreach ($periods['dhis.periods'] as $key => $value){
+        Term::create([
+          'name' => $key,
+          'vid' => $vid,
+          'description' => $value
+         ])->save();
+    }
 }
 
 /**
