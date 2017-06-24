@@ -61,13 +61,10 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     return $element;
   }
   public function generateAnalytics(Request $request){
-    drupal_set_message(json_encode($this->getEntities(),1));
-    //$dx = ['hfdmMSPBgLG','P3jJH5Tu5VC'];
     $entities = $this->getEntities();
-    //$dx =  array_merge($dx, $this->getEntities()['dx']);
     $dx = $entities['dx'];
     $ou = $entities['ou'];
-    //$ou = ['ImspTQPwCqd'];
+    
     $pe = ['THIS_YEAR'];
     $analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
     $data = [];
