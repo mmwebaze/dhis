@@ -5,7 +5,8 @@ namespace Drupal\dhis\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManager;
-use Drupal\Core\Url;
+use Drupal\dhis\Entity\OrganisationUnit;
+use Drupal\dhis\Entity\DataElement;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\dhis\Services\AnalyticService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -60,45 +61,69 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     return $element;
   }
   public function generateAnalytics(Request $request){
-    $dx = ['hfdmMSPBgLG'];
-    $ou = ['ImspTQPwCqd'];
+    drupal_set_message(json_encode($this->getEntities(),1));
+    //$dx = ['hfdmMSPBgLG','P3jJH5Tu5VC'];
+    $entities = $this->getEntities();
+    //$dx =  array_merge($dx, $this->getEntities()['dx']);
+    $dx = $entities['dx'];
+    $ou = $entities['ou'];
+    //$ou = ['ImspTQPwCqd'];
     $pe = ['THIS_YEAR'];
     $analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
     $data = [];
 
-      $data['rows'] = $analyticsData['rows'];
+    $data['rows'] = $analyticsData['rows'];
 
+    $data['dimensions'] = $analyticsData['metaData']['dimensions'];
 
-      $data['dimensions'] = $analyticsData['metaData']['dimensions'];
+    $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Value'];
+    $csvHandler = new CsvHandler($this->file_system);
+    $csvHandler->createCsv($header, $analyticsData['rows']);
 
-      $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Value'];
-      $csvHandler = new CsvHandler($this->file_system);
-      $csvHandler->createCsv($header, $analyticsData['rows']);
+    $output = array(
+        '#theme' => 'table',
+        '#url' => 'sites/files/data.csv',
+        //'#cache' => ['disabled' => TRUE],
+        '#caption' => ' Data pulled',
+        '#header' => $header,
+        '#rows' => $data['rows'],
+    );
 
-      $output = array(
-          '#theme' => 'table',
-          '#url' => 'sites/drupal-8-3-1.dd/files/data.csv',
-          //'#cache' => ['disabled' => TRUE],
-          '#caption' => ' Data pulled',
-          '#header' => $header,
-          '#rows' => $data['rows'],
-      );
+    $this->content['table'] = $output;
+    $this->content['url'] = '/sites/default/files/data.csv';
 
-      $this->content['table'] = $output;
-      $this->content['url'] = 'sites/drupal-8-3-1.dd/files/data.csv';
-
-      $element = [
-          '#theme' => 'dhis',
-          '#test_var' => $this->content,
-      ];
-      return $element;
+    $element = [
+        '#theme' => 'dhis',
+        '#test_var' => $this->content,
+    ];
+    return $element;
   }
   public static function create(ContainerInterface $container){
     return new static(
       $container->get('entity_type.manager'),
       $container->get('dhis_analytics'),
-        $container->get('file_system'),
-        $container->get('path.current')
+      $container->get('file_system'),
+      $container->get('path.current')
     );
+  }
+  private function getEntities(){
+    $entities = [];
+    $dxElementUids = [];
+    $orgUnitUids = [];
+    $dataElements = DataElement::loadMultiple();
+
+    foreach ($dataElements as $dx){
+        array_push($dxElementUids, $dx->getDataElementUid());
+    }
+    $entities['dx'] = $dxElementUids;
+
+    $orgUnits = OrganisationUnit::loadMultiple();
+    foreach ($orgUnits as $ou){
+        array_push($orgUnitUids, $ou->getOrgunitUid());
+    }
+
+    $entities['ou'] = $orgUnitUids;
+    drupal_set_message(json_encode($entities, 1).' uids both dx and ous');
+    return $entities;
   }
 }

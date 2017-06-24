@@ -4,6 +4,8 @@
  * @file
  * Contains dhis.module.
  */
+use Drupal\dhis\Entity\OrganisationUnit;
+use Drupal\dhis\Entity\DataElement;
 
 use Drupal\Core\Routing\RouteMatchInterface;
 

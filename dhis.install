@@ -2,6 +2,8 @@
 use Symfony\Component\Yaml\Yaml;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\dhis\Entity\OrganisationUnit;
+use Drupal\dhis\Entity\DataElement;
 
 /**
  * @file
@@ -32,5 +34,23 @@ function dhis_install(){
  * Implements hook_uninstall.
  */
 function dhis_uninstall(){
+  print('Starting uninstall process');
+  $entities = ['data_element', 'organisation_unit'];
+  foreach($entities as $entity){
+     $vids = [];
+     if ($entity == 'data_element'){
+       $vids = DataElement::loadMultiple();
+     }
+     if ($entity == 'organisation_unit'){
+       $vids = OrganisationUnit::loadMultiple();
+     }
+     //$this->entity_manager->getStorage($entity_id)->delete($vids);
+     \Drupal::entityTypeManager()->getStorage($entity)->delete($vids);
+  }
+  $entity_settings = ['OrganisationUnit_settings', 'DataElement_settings'];
+
+   foreach($entity_settings as $entity_setting){
+     \Drupal::configFactory()->getEditable($entity_setting)->delete();
+   }
 
 }

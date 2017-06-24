@@ -51,7 +51,7 @@ class VisualizerForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $dx = ['hfdmMSPBgLG'];
+    $dx = ['hfdmMSPBgLG', 'FTRrcoaog83'];
     $ou = ['ImspTQPwCqd'];
     $pe = ['THIS_YEAR'];
     $this->analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
