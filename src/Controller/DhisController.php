@@ -66,8 +66,7 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     $entities = $this->getEntities();
     $dx = $entities['dx'];
     $ou = $entities['ou'];
-
-    //$pe = ['THIS_YEAR'];
+      
     $analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
     $data = [];
 
@@ -75,22 +74,40 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
 
     $data['dimensions'] = $analyticsData['metaData']['dimensions'];
       $pe = $data['dimensions']['pe'];
-      drupal_set_message(json_encode($pe, 1));
-      $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#'];
-      foreach ($pe as $item) {
-          array_push($header, $item);
+    $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Period', 'Value'];
+    $rowsTemp = [];
+      for ($i = 0; $i < count($data['rows']); $i++){
+          $temp = [];
+          for($j = 0; $j < 8; $j++){
+              array_push($temp, $data['rows'][$i][$j]);
+          }
+          array_push($rowsTemp, $temp);
       }
-//    $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Value'];
+
+      $rows = [];
+      $y = count($data['rows'][0]) - count($pe); //Numbr of non data value rows
+
+      foreach ($data['rows'] as $key => $row){
+          $counter = 0; //iterates through the activated periods
+          for ($x = $y; $x < count($row); $x++){
+
+              $temp = $rowsTemp[$key];
+             array_push($temp, $pe[$counter] );
+              $counter++;
+              array_push($temp, $row[$x]);
+              array_push($rows, $temp);
+          }
+      }
+
     $csvHandler = new CsvHandler($this->file_system);
-    $csvHandler->createCsv($header, $analyticsData['rows']);
+    $csvHandler->createCsv($header, $rows);
 
     $output = array(
         '#theme' => 'table',
-        '#url' => 'sites/files/data.csv',
         //'#cache' => ['disabled' => TRUE],
         '#caption' => ' Data pulled',
         '#header' => $header,
-        '#rows' => $data['rows'],
+        '#rows' => $rows,
     );
 
     $this->content['table'] = $output;
