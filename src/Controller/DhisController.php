@@ -21,14 +21,14 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
   protected $entity_manager;
   private $content = [];
   private $dhis_analytics;
-    private $file_system;
-    private $path_current;
+  private $file_system;
+  private $path_current;
 
   public function __construct(EntityTypeManager $entity_manager, AnalyticService $dhis_analytics, FileSystem $file_system, CurrentPathStack $path_current) {
     $this->entity_manager = $entity_manager;
     $this->dhis_analytics = $dhis_analytics;
-      $this->file_system = $file_system;
-      $this->path_current = $path_current;
+    $this->file_system = $file_system;
+    $this->path_current = $path_current;
   }
 
   public function display(){
@@ -61,19 +61,26 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     return $element;
   }
   public function generateAnalytics(Request $request){
+    $pe = $this->getActivatedPeriods('dhis_period');
+
     $entities = $this->getEntities();
     $dx = $entities['dx'];
     $ou = $entities['ou'];
-    
-    $pe = ['THIS_YEAR'];
+
+    //$pe = ['THIS_YEAR'];
     $analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
     $data = [];
 
     $data['rows'] = $analyticsData['rows'];
 
     $data['dimensions'] = $analyticsData['metaData']['dimensions'];
-
-    $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Value'];
+      $pe = $data['dimensions']['pe'];
+      drupal_set_message(json_encode($pe, 1));
+      $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#'];
+      foreach ($pe as $item) {
+          array_push($header, $item);
+      }
+//    $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Value'];
     $csvHandler = new CsvHandler($this->file_system);
     $csvHandler->createCsv($header, $analyticsData['rows']);
 
@@ -103,6 +110,21 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
       $container->get('path.current')
     );
   }
+  private function getActivatedPeriods($vid){
+      $activatedPeriods = [];
+      $voc = Vocabulary::load($vid);
+      $terms = $this->entity_manager->getStorage('taxonomy_term')->loadTree($voc->id(),0,NULL,TRUE);;
+      foreach($terms as $term){
+          if ($term->get('activate')->value == 1){
+              array_push($activatedPeriods, $term->getName());
+          }
+      }
+      if (count($activatedPeriods) == 0){
+          array_push($activatedPeriods, 'LAST_4_QUARTERS');
+      }
+
+      return $activatedPeriods;
+  }
   private function getEntities(){
     $entities = [];
     $dxElementUids = [];
@@ -120,7 +142,7 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     }
 
     $entities['ou'] = $orgUnitUids;
-    drupal_set_message(json_encode($entities, 1).' uids both dx and ous');
+
     return $entities;
   }
 }

@@ -4,6 +4,8 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\dhis\Entity\OrganisationUnit;
 use Drupal\dhis\Entity\DataElement;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * @file
@@ -19,14 +21,41 @@ function dhis_install(){
     $periods = Yaml::parse($file_contents);
 
     $vid = 'dhis_period';
-    $vocabulary = Vocabulary::create(['name' => 'Dhis2 Periods', 'vid' => $vid, 'description' => 'DHIS2 Relative Periods'])->save();
+    $vocabulary = Vocabulary::create([
+        'name' => 'Dhis2 Periods',
+        'vid' => $vid, 'description' => 'DHIS2 Relative Periods',
+        'activate' => 1
+    ])->save();
+
+    FieldStorageConfig::create(
+        array(
+            'field_name' => 'activate',
+            'entity_type' => 'taxonomy_term',
+            'type' => 'boolean',
+            'settings' => [
+                'max_length' =>'1',
+            ],
+            'cardinality' => 1,
+        )
+    )->save();
+
+    FieldConfig::create([
+        'field_name' => 'activate',
+        'entity_type' => 'taxonomy_term',
+        'bundle' => $vid,
+        'label' => 'Activate',
+        'field_type' => 'boolean',
+        'widget' => [
+
+        ]
+    ])->save();
 
     foreach ($periods['dhis.periods'] as $key => $value){
         Term::create([
-          'name' => $key,
-          'vid' => $vid,
-          'description' => $value
-         ])->save();
+            'name' => $key,
+            'vid' => $vid,
+            'description' => $value
+        ])->save();
     }
 }
 
@@ -34,23 +63,38 @@ function dhis_install(){
  * Implements hook_uninstall.
  */
 function dhis_uninstall(){
-  print('Starting uninstall process');
-  $entities = ['data_element', 'organisation_unit'];
-  foreach($entities as $entity){
-     $vids = [];
-     if ($entity == 'data_element'){
-       $vids = DataElement::loadMultiple();
-     }
-     if ($entity == 'organisation_unit'){
-       $vids = OrganisationUnit::loadMultiple();
-     }
-     //$this->entity_manager->getStorage($entity_id)->delete($vids);
-     \Drupal::entityTypeManager()->getStorage($entity)->delete($vids);
-  }
-  $entity_settings = ['OrganisationUnit_settings', 'DataElement_settings'];
+    print('Starting uninstall process');
+    $entities = ['data_element', 'organisation_unit', 'dhis_period'];
+    foreach($entities as $entity){
+       $vids = [];
+       if ($entity == 'data_element'){
+           $vids = DataElement::loadMultiple();
+           deleteCustomEntity($entity, $vids);
+       }
+       if ($entity == 'organisation_unit'){
+           $vids = OrganisationUnit::loadMultiple();
+           deleteCustomEntity($entity, $vids);
+       }
+       if ($entity == 'dhis_period'){
+           deleteVocabulary($entity);
+       }
+    }
+    $entity_settings = ['OrganisationUnit_settings', 'DataElement_settings'];
 
-   foreach($entity_settings as $entity_setting){
-     \Drupal::configFactory()->getEditable($entity_setting)->delete();
-   }
+     foreach($entity_settings as $entity_setting){
+       \Drupal::configFactory()->getEditable($entity_setting)->delete();
+     }
+}
 
+function deleteVocabulary($vid) {
+    $vocab = Vocabulary::load($vid);
+    if ($vocab) {
+        $vocab->delete();
+    }
+}
+
+function deleteCustomEntity($entity, $vids){
+    if ($vids){
+        \Drupal::entityTypeManager()->getStorage($entity)->delete($vids);
+    }
 }

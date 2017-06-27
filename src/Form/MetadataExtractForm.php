@@ -123,7 +123,6 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
     }
   }
   private function createEntities($metadata, $entity_type, $list = []){
-      drupal_set_message(json_encode($list, 1));
       if ($entity_type == 'organisationunit'){
           foreach ($metadata as $item){
               if (count($list) == 0){
