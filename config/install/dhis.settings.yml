@@ -1,0 +1,3 @@
+dhis_extra.settings:
+  dataelement_file: dx.csv
+  orgunit_file: ou.csv
