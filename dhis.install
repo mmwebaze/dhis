@@ -67,14 +67,20 @@ function dhis_uninstall(){
     $entities = ['data_element', 'organisation_unit', 'dhis_period'];
     foreach($entities as $entity){
        $vids = [];
-       if ($entity == 'data_element'){
-           $vids = DataElement::loadMultiple();
-           deleteCustomEntity($entity, $vids);
-       }
-       if ($entity == 'organisation_unit'){
-           $vids = OrganisationUnit::loadMultiple();
-           deleteCustomEntity($entity, $vids);
-       }
+        try{
+            if ($entity == 'data_element'){
+                $vids = DataElement::loadMultiple();
+                deleteCustomEntity($entity, $vids);
+            }
+            if ($entity == 'organisation_unit'){
+                $vids = OrganisationUnit::loadMultiple();
+                deleteCustomEntity($entity, $vids);
+            }
+        }
+        catch(\Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException $e){
+            print($e->getMessage());
+        }
+
        if ($entity == 'dhis_period'){
            deleteVocabulary($entity);
        }

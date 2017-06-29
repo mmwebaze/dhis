@@ -72,7 +72,8 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
 
     $data['rows'] = $analyticsData['rows'];
 
-    $data['dimensions'] = $analyticsData['metaData']['dimensions'];
+    //$data['dimensions'] = $analyticsData['metaData']['dimensions']; for DHIS2 Only
+      $data['dimensions'] = $analyticsData['metaData']; //for DATIM only
       $pe = $data['dimensions']['pe'];
     $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Period', 'Value'];
     $rowsTemp = [];

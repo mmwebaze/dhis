@@ -33,8 +33,12 @@ class CsvHandler
             $file = fopen($path, "r");
             $line_count = 0;
             while (($line = fgetcsv($file)) !== false) {
+                $temp = [];
                 if ($line_count != 0) {
-                    $content[] = $line[0];
+                    $temp['id'] = $line[0];
+                    $temp['displayName'] = $line[1];
+                    $temp['code'] = $line[2];
+                    array_push($content, $temp);
                 }
                 $line_count++;
             }

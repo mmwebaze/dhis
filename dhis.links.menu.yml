@@ -26,3 +26,28 @@ data_element.admin.structure.settings:
   description: 'Configure Data element entities'
   route_name: data_element.settings
   parent: system.admin_structure
+
+#Dhis configuration and analytics item definitions
+dhis.analytics:
+  title: 'Generate table'
+  description: 'Generate table and download csv file link for configured dhis entities'
+  route_name: dhis.analytics
+  weight: 90
+  parent: main
+  menu_name: main
+
+dhis.metadata_fetch:
+  title: 'Fetch Metadata'
+  description: 'Fetches metadata either from csv file or configured DHIS Instance'
+  route_name: dhis.metadata_fetch
+  weight: 91
+  parent: main
+  menu_name: main
+
+dhis.settings:
+  title: 'DHIS Configurations '
+  description: 'Configure DHIS configuration settings for metadata fetch.'
+  route_name: dhis.settings
+  weight: 92
+  parent: main
+  menu_name: main
