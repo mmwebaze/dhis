@@ -144,7 +144,6 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
           //}
       }
       elseif ($entity_type == 'dataelement'){
-          //drupal_set_message(json_encode($metadata, 1));
          // foreach ($items as $item){
               $this->createDataElementEntity($items);
          // }
@@ -162,7 +161,6 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
   }
   private function createOrganisationUnitEntity($items){
       foreach ($items as $item){
-          drupal_set_message(json_encode($item['id'], 1).' *** ou ***');
           OrganisationUnit::create(['name' => $item['displayName'],
               'orgunituid' => $item['id']])->save();
       }
@@ -170,22 +168,16 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
 
   private function removeEntities($entity_id){
       $vids = [];
-      if ($entity_id == 'data_element'){
-          try{
+      try{
+          if ($entity_id == 'data_element'){
               $vids = DataElement::loadMultiple();
           }
-          catch (NoCorrespondingEntityClassException $e){
-              drupal_set_message('****** de');
-          }
-      }
-      if ($entity_id == 'organisation_unit'){
-          try{
+          if ($entity_id == 'organisation_unit'){
               $vids = OrganisationUnit::loadMultiple();
           }
-          catch (NoCorrespondingEntityClassException $e){
-            drupal_set_message('****** ou');
-          }
-
+      }
+      catch(NoCorrespondingEntityClassException $e){
+          drupal_set_message($this->t('DHIS:'.$e->getMessage()));
       }
       $this->entity_manager->getStorage($entity_id)->delete($vids);
   }
