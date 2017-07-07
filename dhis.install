@@ -15,92 +15,124 @@ use Drupal\field\Entity\FieldStorageConfig;
 /**
  * Implements hook_install.
  */
-function dhis_install(){
-    $module_path = drupal_get_path('module', 'dhis');
-    $file_contents = file_get_contents($module_path.'/dhis.periods.yml');
-    $periods = Yaml::parse($file_contents);
+function dhis_install() {
+  $module_path = drupal_get_path('module', 'dhis');
+  $file_contents_periods = file_get_contents($module_path . '/dhis.periods.yml');
+  $periods = Yaml::parse($file_contents_periods);
+  $file_contents_accounts = file_get_contents($module_path . '/dhis.accounts.yml');
+  $accounts = Yaml::parse($file_contents_accounts);
 
-    $vid = 'dhis_period';
-    $vocabulary = Vocabulary::create([
-        'name' => 'Dhis2 Periods',
-        'vid' => $vid, 'description' => 'DHIS2 Relative Periods',
-        'activate' => 1
-    ])->save();
+  if ($file_contents_accounts){
+    $countries = $accounts['dhis_accounts']['countries'];
+    if (count($countries) != 0){
 
-    FieldStorageConfig::create(
-        array(
-            'field_name' => 'activate',
-            'entity_type' => 'taxonomy_term',
-            'type' => 'boolean',
-            'settings' => [
-                'max_length' =>'1',
-            ],
-            'cardinality' => 1,
-        )
-    )->save();
-
-    FieldConfig::create([
-        'field_name' => 'activate',
-        'entity_type' => 'taxonomy_term',
-        'bundle' => $vid,
-        'label' => 'Activate',
-        'field_type' => 'boolean',
-        'widget' => [
-
-        ]
-    ])->save();
-
-    foreach ($periods['dhis.periods'] as $key => $value){
-        Term::create([
-            'name' => $key,
-            'vid' => $vid,
-            'description' => $value
-        ])->save();
+      foreach ($countries as $key => $value){
+        $vid_account = $key.'_dataelements';
+        $account_voc_params = [
+          'name' => $key.' Data Elements',
+          'vid' => $vid_account, 'description' => $value['uid'],
+        ];
+        createVocabulary($account_voc_params);
+      }
     }
+  }
+
+  $vid = 'dhis_period';
+  $period_voc_params = [
+    'name' => 'Dhis2 Periods',
+    'vid' => $vid, 'description' => 'DHIS2 Relative Periods',
+    'activate' => 1
+  ];
+  createVocabulary($period_voc_params);
+ /* $vocabulary = Vocabulary::create([
+    'name' => 'Dhis2 Periods',
+    'vid' => $vid, 'description' => 'DHIS2 Relative Periods',
+    'activate' => 1
+  ])->save();*/
+
+  FieldStorageConfig::create(
+    array(
+      'field_name' => 'activate',
+      'entity_type' => 'taxonomy_term',
+      'type' => 'boolean',
+      'settings' => [
+        'max_length' => '1',
+      ],
+      'cardinality' => 1,
+    )
+  )->save();
+
+  FieldConfig::create([
+    'field_name' => 'activate',
+    'entity_type' => 'taxonomy_term',
+    'bundle' => $vid,
+    'label' => 'Activate',
+    'field_type' => 'boolean',
+    'widget' => []
+  ])->save();
+
+  foreach ($periods['dhis.periods'] as $key => $value) {
+    Term::create([
+      'name' => $key,
+      'vid' => $vid,
+      'description' => $value
+    ])->save();
+  }
 }
 
 /**
  * Implements hook_uninstall.
  */
-function dhis_uninstall(){
-    print('Starting uninstall process');
-    $entities = ['data_element', 'organisation_unit', 'dhis_period'];
-    foreach($entities as $entity){
-       $vids = [];
-        try{
-            if ($entity == 'data_element'){
-                $vids = DataElement::loadMultiple();
-                deleteCustomEntity($entity, $vids);
-            }
-            if ($entity == 'organisation_unit'){
-                $vids = OrganisationUnit::loadMultiple();
-                deleteCustomEntity($entity, $vids);
-            }
-        }
-        catch(\Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException $e){
-            print($e->getMessage());
-        }
-
-       if ($entity == 'dhis_period'){
-           deleteVocabulary($entity);
-       }
+function dhis_uninstall() {
+  print('Starting uninstall process');
+  $entities = ['data_element', 'organisation_unit', 'dhis_period'];
+  foreach ($entities as $entity) {
+    $vids = [];
+    try {
+      if ($entity == 'data_element') {
+        $vids = DataElement::loadMultiple();
+        deleteCustomEntity($entity, $vids);
+      }
+      if ($entity == 'organisation_unit') {
+        $vids = OrganisationUnit::loadMultiple();
+        deleteCustomEntity($entity, $vids);
+      }
+    } catch (\Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException $e) {
+      print($e->getMessage());
     }
-    $entity_settings = ['OrganisationUnit_settings', 'DataElement_settings'];
 
-     foreach($entity_settings as $entity_setting){
-       \Drupal::configFactory()->getEditable($entity_setting)->delete();
-     }
+    if ($entity == 'dhis_period') {
+      deleteVocabulary($entity);
+    }
+  }
+  $entity_settings = ['OrganisationUnit_settings', 'DataElement_settings'];
+
+  foreach ($entity_settings as $entity_setting) {
+    \Drupal::configFactory()->getEditable($entity_setting)->delete();
+  }
 }
 
 function deleteVocabulary($vid) {
-    $vocab = Vocabulary::load($vid);
-    if ($vocab) {
-        $vocab->delete();
-    }
+  $vocab = Vocabulary::load($vid);
+  if ($vocab) {
+    $vocab->delete();
+  }
 }
 
-function deleteCustomEntity($entity, $vids){
-    if ($vids){
-        \Drupal::entityTypeManager()->getStorage($entity)->delete($vids);
-    }
+function deleteCustomEntity($entity, $vids) {
+  if ($vids) {
+    \Drupal::entityTypeManager()->getStorage($entity)->delete($vids);
+  }
+}
+
+/*function createTaxonomyTerm(array $params){
+  Term::create($params)->save();
+}*/
+
+function createVocabulary(array $params){
+  $vocabulary = Vocabulary::create($params/*[
+    'name' => 'Dhis2 Periods',
+    'vid' => $vid, 'description' => 'DHIS2 Relative Periods',
+    'activate' => 1
+  ]*/)->save();
 }

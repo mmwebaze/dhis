@@ -2,7 +2,7 @@
 
 namespace Drupal\dhis\Form;
 
-
+use Symfony\Component\Yaml\Yaml;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException;
@@ -55,6 +55,7 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
     $config = $this->config_factory->getEditable('dhis.settings');
     $orgUnits = $config->get('dhis.orgUnits');
     $dataElements = $config->get('dhis.dataElements');
+    $dataElementsFile = $config->get('dhis.dataElementsfile');
     /*$indicators = $config->get('dhis.indicators');
     $orgUnitGrp = $config->get('dhis.orgUnitGrp');*/
     $csvHandler = new CsvHandler($this->file_system);
@@ -93,6 +94,32 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
       //$this->createVocabulary($this->content, 'Data Elements');
 
       drupal_set_message('Sucessfully pulled Data Elements units from DHIS2');
+    }
+
+    if ($dataElementsFile == 1){
+      $module_path = drupal_get_path('module', 'dhis');
+      $file_contents_accounts = file_get_contents($module_path . '/dhis.accounts.yml');
+      $accounts = Yaml::parse($file_contents_accounts);
+      if ($file_contents_accounts){
+        $countries = $accounts['dhis_accounts']['countries'];
+        if (count($countries) != 0){
+          //$csvHandler->readCsv()
+          foreach ($countries as $key => $value){
+            $deList = $csvHandler->readCsv($value['dataelements']);
+            foreach ($deList as $item){
+              Term::create(['name' => $item['displayName'],
+                'vid' => $key.'_dataelements',
+                'description' => $item['id']])->save();
+            }
+          }
+        }
+        else{
+          drupal_set_message('The file dhis.accounts.yml is incorrectly configured.');
+        }
+      }
+      else{
+        drupal_set_message('The file dhis.accounts.yml does not exist.');
+      }
     }
   }
   public static function create(ContainerInterface $container){

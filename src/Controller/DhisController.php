@@ -10,7 +10,7 @@ use Drupal\dhis\Entity\DataElement;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\dhis\Services\AnalyticService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Drupal\Core\Config\ConfigFactory;
 use Symfony\Component\HttpFoundation\Request;
 use \Drupal\dhis\Util\CsvHandler;
 use Drupal\Core\File\FileSystem;
@@ -23,12 +23,16 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
   private $dhis_analytics;
   private $file_system;
   private $path_current;
+  private $config_factory;
+  private $dx;
+  private $ou;
 
-  public function __construct(EntityTypeManager $entity_manager, AnalyticService $dhis_analytics, FileSystem $file_system, CurrentPathStack $path_current) {
+  public function __construct(EntityTypeManager $entity_manager, AnalyticService $dhis_analytics, FileSystem $file_system, CurrentPathStack $path_current, ConfigFactory $config_factory) {
     $this->entity_manager = $entity_manager;
     $this->dhis_analytics = $dhis_analytics;
     $this->file_system = $file_system;
     $this->path_current = $path_current;
+    $this->config_factory = $config_factory;
   }
 
   public function display(){
@@ -63,11 +67,31 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
   public function generateAnalytics(Request $request){
     $pe = $this->getActivatedPeriods('dhis_period');
 
-    $entities = $this->getEntities();
-    $dx = $entities['dx'];
-    $ou = $entities['ou'];
-      
-    $analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
+    $config = $this->config_factory->getEditable('dhis.settings');
+    $selectedCountry = $config->get('dhis.country');
+    if (isset($selectedCountry)){
+      $vid = $selectedCountry.'_dataelements';
+      $vocabulary = Vocabulary::loadMultiple([$vid]);
+      $ou = [];
+      $dx = [];
+      array_push($ou, $vocabulary[$vid]->getDescription());
+      $this->ou = $ou;
+
+      $terms = $this->entity_manager->getStorage('taxonomy_term')->loadTree($vid,0,NULL,TRUE);
+      if (!empty($terms)) {
+        foreach($terms as $term) {
+          array_push($dx, $term->getDescription());
+        }
+        $this->dx = $dx;
+      }
+    }
+    else{
+      $entities = $this->getEntities();
+      $this->dx = $entities['dx'];
+      $this->ou = $entities['ou'];
+    }
+
+    $analyticsData = $this->dhis_analytics->generateAnalytics($this->dx, $this->ou, $pe);
     $data = [];
 
     $data['rows'] = $analyticsData['rows'];
@@ -125,7 +149,8 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
       $container->get('entity_type.manager'),
       $container->get('dhis_analytics'),
       $container->get('file_system'),
-      $container->get('path.current')
+      $container->get('path.current'),
+      $container->get('config.factory')
     );
   }
   private function getActivatedPeriods($vid){
