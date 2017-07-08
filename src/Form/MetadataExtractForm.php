@@ -102,8 +102,8 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
       $accounts = Yaml::parse($file_contents_accounts);
       if ($file_contents_accounts){
         $countries = $accounts['dhis_accounts']['countries'];
+
         if (count($countries) != 0){
-          //$csvHandler->readCsv()
           foreach ($countries as $key => $value){
             $deList = $csvHandler->readCsv($value['dataelements']);
             foreach ($deList as $item){

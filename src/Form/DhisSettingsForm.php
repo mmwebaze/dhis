@@ -106,6 +106,7 @@ class DhisSettingsForm extends ConfigFormBase {
         foreach($countries as $key => $value){
           $options[$key] = t($key);
         }
+        $options['None'] = t('none');
 
         $form['accounts']['country'] = array(
           '#type' => 'radios',

@@ -85,7 +85,17 @@ function dhis_install() {
  */
 function dhis_uninstall() {
   print('Starting uninstall process');
+  $module_path = drupal_get_path('module', 'dhis');
+  $file_contents_accounts = file_get_contents($module_path . '/dhis.accounts.yml');
+  $accounts = Yaml::parse($file_contents_accounts);
+  $countries = $accounts['dhis_accounts']['countries'];
+
   $entities = ['data_element', 'organisation_unit', 'dhis_period'];
+
+  foreach($countries as $key => $value){
+    array_push($entities, $key.'_dataelements');
+  }
+  var_dump($entities);
   foreach ($entities as $entity) {
     $vids = [];
     try {
@@ -100,10 +110,10 @@ function dhis_uninstall() {
     } catch (\Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException $e) {
       print($e->getMessage());
     }
-
-    if ($entity == 'dhis_period') {
+    deleteVocabulary($entity);
+    /*if ($entity == 'dhis_period') {
       deleteVocabulary($entity);
-    }
+    }*/
   }
   $entity_settings = ['OrganisationUnit_settings', 'DataElement_settings'];
 

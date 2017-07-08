@@ -69,7 +69,8 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
 
     $config = $this->config_factory->getEditable('dhis.settings');
     $selectedCountry = $config->get('dhis.country');
-    if (isset($selectedCountry)){
+
+    if (isset($selectedCountry) && $selectedCountry != 'None'){
       $vid = $selectedCountry.'_dataelements';
       $vocabulary = Vocabulary::loadMultiple([$vid]);
       $ou = [];
@@ -101,6 +102,7 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
       $pe = $data['dimensions']['pe'];
     $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Period', 'Value'];
     $rowsTemp = [];
+    $y = count($data['rows'][0]) - count($pe); //Numbr of non data value rows
       for ($i = 0; $i < count($data['rows']); $i++){
           $temp = [];
           for($j = 0; $j < 8; $j++){
@@ -108,10 +110,11 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
           }
           array_push($rowsTemp, $temp);
       }
-
+      for ($i = 0; $i < count($rowsTemp); $i++){
+        $comboUid = explode('.', $rowsTemp[$i][0]);
+        $rowsTemp[$i][$y - 1] = $comboUid[1];
+      }
       $rows = [];
-      $y = count($data['rows'][0]) - count($pe); //Numbr of non data value rows
-
       foreach ($data['rows'] as $key => $row){
           $counter = 0; //iterates through the activated periods
           for ($x = $y; $x < count($row); $x++){
