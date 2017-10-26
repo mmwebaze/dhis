@@ -93,6 +93,7 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     }
 
     $analyticsData = $this->dhis_analytics->generateAnalytics($this->dx, $this->ou, $pe);
+
     $data = [];
 
     $data['rows'] = $analyticsData['rows'];
@@ -100,7 +101,7 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     //$data['dimensions'] = $analyticsData['metaData']['dimensions']; for DHIS2 Only
       $data['dimensions'] = $analyticsData['metaData']; //for DATIM only
       $pe = $data['dimensions']['pe'];
-    $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Period', 'Value'];
+    $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', 'Disaggregation', 'Period', 'Value'];
     $rowsTemp = [];
     $y = count($data['rows'][0]) - count($pe); //Numbr of non data value rows
       for ($i = 0; $i < count($data['rows']); $i++){
@@ -110,9 +111,23 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
           }
           array_push($rowsTemp, $temp);
       }
+      //inserting category combo ids in row data
+      $categoryTaxonomyTerms = $this->entity_manager->getStorage('taxonomy_term')->loadTree('dhis_categories',0,NULL,TRUE);
+      $categoryTerms = [];
+      if (!empty($categoryTaxonomyTerms)) {
+        foreach($categoryTaxonomyTerms as $term) {
+          $categoryTerms[$term->getDescription()] = $term->getName();
+          //var_dump($categoryTerms);die($categoryTerms);
+        }
+      }
+
       for ($i = 0; $i < count($rowsTemp); $i++){
         $comboUid = explode('.', $rowsTemp[$i][0]);
-        $rowsTemp[$i][$y - 1] = $comboUid[1];
+        if (count($categoryTerms) != 0){
+          $rowsTemp[$i][$y - 1] = $categoryTerms[$comboUid[1]];
+        }else{
+          $rowsTemp[$i][$y - 1] = $comboUid[1];
+        }
       }
       $rows = [];
       foreach ($data['rows'] as $key => $row){

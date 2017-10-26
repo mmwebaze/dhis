@@ -56,6 +56,7 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
     $orgUnits = $config->get('dhis.orgUnits');
     $dataElements = $config->get('dhis.dataElements');
     $dataElementsFile = $config->get('dhis.dataElementsfile');
+    $categories = $config->get('dhis.categories');
     /*$indicators = $config->get('dhis.indicators');
     $orgUnitGrp = $config->get('dhis.orgUnitGrp');*/
     $csvHandler = new CsvHandler($this->file_system);
@@ -90,25 +91,45 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
         else{
             $this->createEntities($deList, 'dataelement');
         }
-
-      //$this->createVocabulary($this->content, 'Data Elements');
-
       drupal_set_message('Sucessfully pulled Data Elements units from DHIS2');
     }
 
     if ($dataElementsFile == 1){
       $module_path = drupal_get_path('module', 'dhis');
       $file_contents_accounts = file_get_contents($module_path . '/dhis.accounts.yml');
-      $accounts = Yaml::parse($file_contents_accounts);
+
       if ($file_contents_accounts){
+        $accounts = Yaml::parse($file_contents_accounts);
         $countries = $accounts['dhis_accounts']['countries'];
 
         if (count($countries) != 0){
+          $category_voc_params = [
+            'name' => 'Dhis2 Categories',
+            'description' => 'DHIS2 Category combinations.',
+            'vid' => 'dhis_categories'
+          ];
+          $this->createVocabulary($category_voc_params);
+
+          foreach ($countries as $key => $value){
+            $vid_account = $key.'_dataelements';
+            $account_voc_params = [
+              'name' => $key.' Data Elements',
+              'vid' => $vid_account, 'description' => $value['uid'],
+            ];
+            $this->createVocabulary($account_voc_params);
+          }
+
           foreach ($countries as $key => $value){
             $deList = $csvHandler->readCsv($value['dataelements']);
             foreach ($deList as $item){
               Term::create(['name' => $item['displayName'],
                 'vid' => $key.'_dataelements',
+                'description' => $item['id']])->save();
+            }
+            $categoryList = $csvHandler->readCsv($value['categories']);
+            foreach($categoryList as $item){
+              Term::create(['name' => $item['displayName'],
+                'vid' => 'dhis_categories',
                 'description' => $item['id']])->save();
             }
           }
@@ -129,40 +150,8 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
         $container->get('entity_type.manager')
     );
   }
-  private function createVocabulary($metadata, $vocabularyName){
-    $vid = str_replace(' ', '_', 'dhis_'.strtolower($vocabularyName));
-    $vocabulary = Vocabulary::create(['name' => $vocabularyName, 'vid' => $vid,])->save();
-    $field_name = str_replace(' ', '_', 'dhis2_uid'.strtolower($vocabularyName));
-    FieldStorageConfig::create(
-      array(
-        'field_name' => $field_name,
-        'entity_type' => 'taxonomy_term',
-        'type' => 'text',
-        'settings' => [
-          'max_length' =>'12',
-        ],
-        'cardinality' => 1,
-      )
-    )->save();
-    FieldConfig::create([
-      'field_name' => $field_name,
-      'entity_type' => 'taxonomy_term',
-      'bundle' => $vid,
-      'label' => $vocabularyName.' uid',
-      'field_type' => 'text',
-      'required' => TRUE,
-      'settings' => [
-
-      ]
-    ])->save();
-    foreach ($metadata as $item){
-      Term::create([
-        'name' => $item['displayName'],
-        'vid' => $vid,
-        //'dhis2_uid'.strtolower($vocabularyName) => $item['id']
-        'description' => $item['id']
-      ])->save();
-    }
+  private function createVocabulary(array $params){
+    $vocabulary = Vocabulary::create($params)->save();
   }
   private function createEntities($items, $entity_type){
       if ($entity_type == 'organisationunit'){

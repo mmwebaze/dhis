@@ -259,5 +259,4 @@ class DataElement extends ContentEntityBase implements DataElementInterface {
   public function getDataElementCode() {
     return $this->get('decode')->value;
   }
-
 }

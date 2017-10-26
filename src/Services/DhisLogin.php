@@ -8,6 +8,7 @@ namespace Drupal\dhis\Services;
 
 use Drupal\Core\Config\ConfigFactory;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7;
 
 class DhisLogin implements LoginService {
 
@@ -28,7 +29,15 @@ class DhisLogin implements LoginService {
   public function login($url){
     $client = new Client();
       drupal_set_message($this->baseUrl.$url);
-    $response = $client->request('GET', $this->baseUrl.$url,['auth' =>[$this->username,$this->password]]);
+    $response = $client->request('GET', $this->baseUrl.$url,[
+      'auth' =>[$this->username,$this->password],
+      [
+        'headers' => [
+          'Accept' => 'application/json;charset=UTF-8'
+        ]
+      ]
+    ]);
+
     return json_decode($response->getBody()->getContents(), true);
   }
 
@@ -42,4 +51,23 @@ class DhisLogin implements LoginService {
 
     return $this->isSessionAlive;
   }
+
+ /* public function login($url){
+    $client = new Client(['headers' => [
+      'Content-Type' => 'application/json;charset=UTF-8'
+    ]]);
+    drupal_set_message($this->baseUrl.$url);
+    $response = $client->request('POST', $this->baseUrl.$url,[
+      'form_params' => [
+        'j_username' => $this->username,
+        'j_password' => $this->password
+      ]
+    ]);
+    $stream = Psr7\stream_for($response->getBody());
+    echo $stream;
+    die();
+    var_dump((string)$response->getBody()->getContents());die();
+    return json_decode($response->getBody()->getContents(), true);
+
+  }*/
 }

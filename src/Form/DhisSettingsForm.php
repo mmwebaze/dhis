@@ -81,7 +81,7 @@ class DhisSettingsForm extends ConfigFormBase {
     );
     $form['metadata']['dataElementsfile'] = array(
       '#type' => 'checkbox',
-      '#title' => $this->t('Data Elements from file'),
+      '#title' => $this->t('Org unit specific data Elements from file'),
       '#default_value' => $config->get('dhis.dataElementsfile'),
     );
     $form['metadata']['indicators'] = array(
@@ -89,7 +89,6 @@ class DhisSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Indicators'),
       '#default_value' => $config->get('dhis.indicators'),
     );
-
 
     $module_path = drupal_get_path('module', 'dhis');
     $file_contents_accounts = file_get_contents($module_path . '/dhis.accounts.yml');

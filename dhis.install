@@ -19,24 +19,6 @@ function dhis_install() {
   $module_path = drupal_get_path('module', 'dhis');
   $file_contents_periods = file_get_contents($module_path . '/dhis.periods.yml');
   $periods = Yaml::parse($file_contents_periods);
-  $file_contents_accounts = file_get_contents($module_path . '/dhis.accounts.yml');
-  $accounts = Yaml::parse($file_contents_accounts);
-
-  if ($file_contents_accounts){
-    $countries = $accounts['dhis_accounts']['countries'];
-    if (count($countries) != 0){
-
-      foreach ($countries as $key => $value){
-        $vid_account = $key.'_dataelements';
-        $account_voc_params = [
-          'name' => $key.' Data Elements',
-          'vid' => $vid_account, 'description' => $value['uid'],
-        ];
-        createVocabulary($account_voc_params);
-      }
-    }
-  }
-
   $vid = 'dhis_period';
   $period_voc_params = [
     'name' => 'Dhis2 Periods',
@@ -44,11 +26,6 @@ function dhis_install() {
     'activate' => 1
   ];
   createVocabulary($period_voc_params);
- /* $vocabulary = Vocabulary::create([
-    'name' => 'Dhis2 Periods',
-    'vid' => $vid, 'description' => 'DHIS2 Relative Periods',
-    'activate' => 1
-  ])->save();*/
 
   FieldStorageConfig::create(
     array(
@@ -95,7 +72,7 @@ function dhis_uninstall() {
   foreach($countries as $key => $value){
     array_push($entities, $key.'_dataelements');
   }
-  var_dump($entities);
+
   foreach ($entities as $entity) {
     $vids = [];
     try {
@@ -111,9 +88,6 @@ function dhis_uninstall() {
       print($e->getMessage());
     }
     deleteVocabulary($entity);
-    /*if ($entity == 'dhis_period') {
-      deleteVocabulary($entity);
-    }*/
   }
   $entity_settings = ['OrganisationUnit_settings', 'DataElement_settings'];
 
@@ -135,14 +109,6 @@ function deleteCustomEntity($entity, $vids) {
   }
 }
 
-/*function createTaxonomyTerm(array $params){
-  Term::create($params)->save();
-}*/
-
 function createVocabulary(array $params){
-  $vocabulary = Vocabulary::create($params/*[
-    'name' => 'Dhis2 Periods',
-    'vid' => $vid, 'description' => 'DHIS2 Relative Periods',
-    'activate' => 1
-  ]*/)->save();
+  $vocabulary = Vocabulary::create($params)->save();
 }
