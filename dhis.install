@@ -66,7 +66,7 @@ function dhis_uninstall(){
     print('Starting uninstall process');
     $entities = ['data_element', 'organisation_unit', 'dhis_period'];
     foreach($entities as $entity){
-       $vids = [];
+        $vids = [];
         try{
             if ($entity == 'data_element'){
                 $vids = DataElement::loadMultiple();
@@ -81,15 +81,15 @@ function dhis_uninstall(){
             print($e->getMessage());
         }
 
-       if ($entity == 'dhis_period'){
-           deleteVocabulary($entity);
-       }
+        if ($entity == 'dhis_period'){
+            deleteVocabulary($entity);
+        }
     }
     $entity_settings = ['OrganisationUnit_settings', 'DataElement_settings'];
 
-     foreach($entity_settings as $entity_setting){
-       \Drupal::configFactory()->getEditable($entity_setting)->delete();
-     }
+    foreach($entity_settings as $entity_setting){
+        \Drupal::configFactory()->getEditable($entity_setting)->delete();
+    }
 }
 
 function deleteVocabulary($vid) {

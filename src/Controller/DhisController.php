@@ -61,54 +61,29 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     return $element;
   }
   public function generateAnalytics(Request $request){
-    $pe = $this->getActivatedPeriods('dhis_period');
-
     $entities = $this->getEntities();
     $dx = $entities['dx'];
     $ou = $entities['ou'];
-      
+
+    $pe = ['THIS_YEAR'];
     $analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
     $data = [];
 
     $data['rows'] = $analyticsData['rows'];
 
-    //$data['dimensions'] = $analyticsData['metaData']['dimensions']; for DHIS2 Only
-      $data['dimensions'] = $analyticsData['metaData']; //for DATIM only
-      $pe = $data['dimensions']['pe'];
-    $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Period', 'Value'];
-    $rowsTemp = [];
-      for ($i = 0; $i < count($data['rows']); $i++){
-          $temp = [];
-          for($j = 0; $j < 8; $j++){
-              array_push($temp, $data['rows'][$i][$j]);
-          }
-          array_push($rowsTemp, $temp);
-      }
+    $data['dimensions'] = $analyticsData['metaData']['dimensions'];
 
-      $rows = [];
-      $y = count($data['rows'][0]) - count($pe); //Numbr of non data value rows
-
-      foreach ($data['rows'] as $key => $row){
-          $counter = 0; //iterates through the activated periods
-          for ($x = $y; $x < count($row); $x++){
-
-              $temp = $rowsTemp[$key];
-             array_push($temp, $pe[$counter] );
-              $counter++;
-              array_push($temp, $row[$x]);
-              array_push($rows, $temp);
-          }
-      }
-
+    $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Value'];
     $csvHandler = new CsvHandler($this->file_system);
-    $csvHandler->createCsv($header, $rows);
+    $csvHandler->createCsv($header, $analyticsData['rows']);
 
     $output = array(
         '#theme' => 'table',
+        '#url' => 'sites/files/data.csv',
         //'#cache' => ['disabled' => TRUE],
         '#caption' => ' Data pulled',
         '#header' => $header,
-        '#rows' => $rows,
+        '#rows' => $data['rows'],
     );
 
     $this->content['table'] = $output;
@@ -127,21 +102,6 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
       $container->get('file_system'),
       $container->get('path.current')
     );
-  }
-  private function getActivatedPeriods($vid){
-      $activatedPeriods = [];
-      $voc = Vocabulary::load($vid);
-      $terms = $this->entity_manager->getStorage('taxonomy_term')->loadTree($voc->id(),0,NULL,TRUE);;
-      foreach($terms as $term){
-          if ($term->get('activate')->value == 1){
-              array_push($activatedPeriods, $term->getName());
-          }
-      }
-      if (count($activatedPeriods) == 0){
-          array_push($activatedPeriods, 'LAST_4_QUARTERS');
-      }
-
-      return $activatedPeriods;
   }
   private function getEntities(){
     $entities = [];

@@ -6,6 +6,13 @@ dhis.settings:
   requirements:
     _permission: 'administer site configuration'
 
+dhis.dataelement_filter:
+  path: '/admin/structure/data_element/{arg}'
+  #defaults:
+   # _form: '\Drupal\dhis\DataElementListBuilder'
+  requirements:
+    _permission: 'administer site configuration'
+
 dhis.display:
   path: '/dhis/display'
   defaults:
@@ -28,3 +35,11 @@ dhis.metadata_fetch:
     _title: 'Dhis2 Metadata Fetch'
   requirements:
     _permission: 'administer site configuration'
+
+dhis.admin_dhis:
+  path: '/admin/dhis'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Dhis'
+  requirements:
+    _permission: 'access dhis administration pages'

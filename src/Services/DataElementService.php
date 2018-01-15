@@ -22,13 +22,13 @@ class DataElementService implements DataElementServiceInterface
 
     public function getDataElementByCode($code, $format="JSON")
     {
-        $dataElementEndPoint = $this->dataElementEndPoint."/".$code.".".Validator::verifyFormat($format)."?fields=id,displayName";
+        $dataElementEndPoint = $this->dataElementEndPoint."/".$code.".".Validator::verifyFormat($format)."?fields=id,code,displayName";
         return $this->loginService->login($dataElementEndPoint);
     }
 
     public function getDataElements($isPaginated = TRUE, $format="JSON")
     {
-        $dataElementEndPoint = $this->dataElementEndPoint.".".Validator::verifyFormat($format)."?fields=id,displayName&paging=".Validator::verifyPagination($isPaginated);
+        $dataElementEndPoint = $this->dataElementEndPoint.".".Validator::verifyFormat($format)."?fields=id,code,displayName&paging=".Validator::verifyPagination($isPaginated);
         return $this->loginService->login($dataElementEndPoint);
     }
 

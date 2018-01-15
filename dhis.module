@@ -36,3 +36,9 @@ function dhis_theme($existing, $type, $theme, $path) {
     ],
   ];
 }
+/**
+ * Implements hook_toolbar_alter().
+ */
+function dhis_toolbar_alter(&$items) {
+    $items['administration']['#attached']['library'][] = 'dhis/toolbar';
+}

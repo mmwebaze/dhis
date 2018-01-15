@@ -6,3 +6,9 @@ dhis_dhis:
     js/dhis.js: {}
   dependencies:
       - core/jquery
+
+toolbar:
+  version: VERSION
+  css:
+    theme:
+      css/dhis.icons.css: {}

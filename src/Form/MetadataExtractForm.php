@@ -5,7 +5,6 @@ namespace Drupal\dhis\Form;
 
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\dhis\Entity\OrganisationUnit;
@@ -62,36 +61,22 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
 
     if ($orgUnits == 1){
         $this->removeEntities('organisation_unit');
-        $ouList = $csvHandler->readCsv('ou.csv');
-        if (count($ouList) == 0){
-            $orgUnitService = \Drupal::service('dhis.orgunit');
-            $this->content = $orgUnitService->getOrgUnits(FALSE);
-            $this->content = $this->content['organisationUnits'];
-            //$this->createVocabulary($this->content, 'Organisation Units');
-            $this->createEntities($this->content, 'organisationunit');
-        }
-        else{
-            $this->createEntities($ouList, 'organisationunit');
-        }
-
+      $orgUnitService = \Drupal::service('dhis.orgunit');
+      $this->content = $orgUnitService->getOrgUnits(FALSE);
+      $this->content = $this->content['organisationUnits'];
+      //$this->createVocabulary($this->content, 'Organisation Units');
+      $this->createEntities($this->content, 'organisationunit', $csvHandler->readCsv('ou.csv'));
       drupal_set_message('Sucessfully pulled organisation units from DHIS2');
     }
 
     if($dataElements == 1){
         $this->removeEntities('data_element');
-        $deList = $csvHandler->readCsv('dx.csv');
-        if (count($deList) == 0){
-            $dataElementService = \Drupal::service('dhis.dataelement');
-            $this->content = $dataElementService->getDataElements(FALSE);
-            $this->content = $this->content['dataElements'];
-            $this->createEntities($this->content, 'dataelement');
-        }
-        else{
-            $this->createEntities($deList, 'dataelement');
-        }
 
+      $dataElementService = \Drupal::service('dhis.dataelement');
+      $this->content = $dataElementService->getDataElements(FALSE);
+      $this->content = $this->content['dataElements'];
       //$this->createVocabulary($this->content, 'Data Elements');
-
+      $this->createEntities($this->content, 'dataelement', $csvHandler->readCsv('dx.csv'));
       drupal_set_message('Sucessfully pulled Data Elements units from DHIS2');
     }
   }
@@ -137,47 +122,52 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
       ])->save();
     }
   }
-  private function createEntities($items, $entity_type){
+  private function createEntities($metadata, $entity_type, $list = []){
       if ($entity_type == 'organisationunit'){
-          //foreach ($items as $item){
-              $this->createOrganisationUnitEntity($items);
-          //}
+          foreach ($metadata as $item){
+              if (count($list) == 0){
+                  $this->createOrganisationUnitEntity($item);
+              }
+              else{
+                  if (in_array($item['id'], $list)){
+                      $this->createOrganisationUnitEntity($item);
+                  }
+              }
+          }
       }
       elseif ($entity_type == 'dataelement'){
-         // foreach ($items as $item){
-              $this->createDataElementEntity($items);
-         // }
+          //drupal_set_message(json_encode($metadata, 1));
+          foreach ($metadata as $item){
+              if (count($list) == 0){
+                  $this->createDataElementEntity($item);
+              }
+              else{
+                  if (in_array($item['id'], $list)){
+                      $this->createDataElementEntity($item);
+                  }
+              }
+          }
       }
       else{
           //add indicators
       }
   }
-  private function createDataElementEntity($items){
-      foreach ($items as $item){
-          DataElement::create(['name' => $item['displayName'],
-              'deuid' => $item['id'],
-          'decode' => $item['code']])->save();
-      }
+  private function createDataElementEntity($item){
+      DataElement::create(['name' => $item['displayName'],
+          'deuid' => $item['id']])->save();
   }
-  private function createOrganisationUnitEntity($items){
-      foreach ($items as $item){
-          OrganisationUnit::create(['name' => $item['displayName'],
-              'orgunituid' => $item['id']])->save();
-      }
+  private function createOrganisationUnitEntity($item){
+      OrganisationUnit::create(['name' => $item['displayName'],
+          'orgunituid' => $item['id']])->save();
   }
 
   private function removeEntities($entity_id){
       $vids = [];
-      try{
-          if ($entity_id == 'data_element'){
-              $vids = DataElement::loadMultiple();
-          }
-          if ($entity_id == 'organisation_unit'){
-              $vids = OrganisationUnit::loadMultiple();
-          }
+      if ($entity_id == 'data_element'){
+          $vids = DataElement::loadMultiple();
       }
-      catch(NoCorrespondingEntityClassException $e){
-          drupal_set_message($this->t('DHIS:'.$e->getMessage()));
+      if ($entity_id == 'organisation_unit'){
+          $vids = OrganisationUnit::loadMultiple();
       }
       $this->entity_manager->getStorage($entity_id)->delete($vids);
   }
