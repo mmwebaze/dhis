@@ -7,6 +7,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\dhis\Entity\OrganisationUnit;
 use Drupal\dhis\Entity\DataElement;
+use Drupal\dhis\Services\DhisEntityService;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\dhis\Services\AnalyticService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -18,14 +19,14 @@ use Drupal\Core\Path\CurrentPathStack;
 
 class DhisController extends ControllerBase implements ContainerInjectionInterface {
 
-  protected $entity_manager;
+  protected $dhis_entity;
   private $content = [];
   private $dhis_analytics;
   private $file_system;
   private $path_current;
 
-  public function __construct(EntityTypeManager $entity_manager, AnalyticService $dhis_analytics, FileSystem $file_system, CurrentPathStack $path_current) {
-    $this->entity_manager = $entity_manager;
+  public function __construct(DhisEntityService $dhis_entity, AnalyticService $dhis_analytics, FileSystem $file_system, CurrentPathStack $path_current) {
+    $this->dhis_entity = $dhis_entity;
     $this->dhis_analytics = $dhis_analytics;
     $this->file_system = $file_system;
     $this->path_current = $path_current;
@@ -61,12 +62,12 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     return $element;
   }
   public function generateAnalytics(Request $request){
-    $entities = $this->getEntities();
-    //print(json_encode($entities)); die();
-    $dx = $entities['dx'];
-    $ou = $entities['ou'];
+
+    $dx = $this->dhis_entity->getDhisEntities('data_element');
+    $ou = $this->dhis_entity->getDhisEntities('organisation_unit');
 
     $pe = ['THIS_YEAR'];
+
     $analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
     $data = [];
 
@@ -98,37 +99,10 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
   }
   public static function create(ContainerInterface $container){
     return new static(
-      $container->get('entity_type.manager'),
+      $container->get('dhis_entity'),
       $container->get('dhis_analytics'),
       $container->get('file_system'),
       $container->get('path.current')
     );
-  }
-  private function getEntities(){
-
-      $storage = $this->entity_manager->getStorage('data_element');
-      $ids = $storage->getQuery()->condition('status', 1, '=')->execute();
-      $dataElements = $storage->loadMultiple($ids);
-
-    $entities = [];
-    $dxElementUids = [];
-    $orgUnitUids = [];
-
-    foreach ($dataElements as $dx){
-        array_push($dxElementUids, $dx->getDataElementUid());
-    }
-    $entities['dx'] = $dxElementUids;
-
-      $storage = $this->entity_manager->getStorage('organisation_unit');
-      $ids = $storage->getQuery()->condition('status', 1, '=')->execute();
-      $orgUnits = $storage->loadMultiple($ids);
-
-    foreach ($orgUnits as $ou){
-        array_push($orgUnitUids, $ou->getOrgunitUid());
-    }
-
-    $entities['ou'] = $orgUnitUids;
-
-    return $entities;
   }
 }

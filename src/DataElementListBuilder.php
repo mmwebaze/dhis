@@ -62,11 +62,11 @@ class DataElementListBuilder extends EntityListBuilder {
             if ($this->limit) {
                 $query->pager($this->limit);
             }
-            $res = $query->execute();
+            $result = $query->execute();
         }
         else {
-            $res = parent::getEntityIds();
+            $result = parent::getEntityIds();
         }
-        return $res;
+        return $result;
     }
 }
