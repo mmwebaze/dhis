@@ -38,4 +38,20 @@ class DhisEntityService{
 
         return $entityUids;
     }
+    public function removeDhisEntities($entity_type){
+        $storage = $this->entity_manager->getStorage($entity_type);
+        $ids = $storage->getQuery()->execute();
+        $entities = $storage->loadMultiple($ids);
+
+        switch ($entity_type){
+            case 'data_element':
+                $storage->delete($entities);
+                break;
+            case 'organisation_unit':
+                $storage->delete($entities);
+                break;
+            default:
+                drupal_set_message($this->t(' Unknown Dhis2 entity type'));
+        }
+    }
 }
