@@ -6,10 +6,16 @@ dhis.settings:
   requirements:
     _permission: 'administer site configuration'
 
+#filter routing
 dhis.dataelement_filter:
   path: '/admin/structure/data_element/{arg}'
   #defaults:
    # _form: '\Drupal\dhis\DataElementListBuilder'
+  requirements:
+    _permission: 'administer site configuration'
+
+dhis.organisationunit_filter:
+  path: '/admin/structure/organisation_unit/{arg}'
   requirements:
     _permission: 'administer site configuration'
 

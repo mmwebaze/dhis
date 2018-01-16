@@ -21,8 +21,9 @@ class OrganisationUnitListBuilder extends EntityListBuilder {
    */
   public function buildHeader() {
     $header['id'] = $this->t('Organisation unit ID');
-    $header['name'] = $this->t('Name');
+    $header['name'] = $this->t('Display Name');
     $header['orgunituid'] = $this->t('Org unit uid');
+      $header['status'] = $this->t('Synchronizable');
     return $header + parent::buildHeader();
   }
 
@@ -41,7 +42,31 @@ class OrganisationUnitListBuilder extends EntityListBuilder {
       )
     );
     $row['orgunituid'] = $entity->getOrgunitUid();
+      $row['status'] = $entity->isPublished();
     return $row + parent::buildRow($entity);
   }
+    public function render(){
+        $form = \Drupal::formBuilder()->getForm('Drupal\dhis\Form\OrganisationUnitFilterForm');
+        $build['form'] = $form;
 
+        $build += parent::render();
+        return $build;
+    }
+    protected function getEntityIds() {
+        $params = \Drupal::request()->query->all();
+        $form_id = $params['form_id'];
+
+        if ($form_id && $form_id === 'OrganisationUnitFilterForm') {
+            $query = \Drupal::entityQuery($this->entityTypeId);
+            $query->condition('name', $params['name'], 'CONTAINS');
+            if ($this->limit) {
+                $query->pager($this->limit);
+            }
+            $res = $query->execute();
+        }
+        else {
+            $res = parent::getEntityIds();
+        }
+        return $res;
+    }
 }

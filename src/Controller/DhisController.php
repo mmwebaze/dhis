@@ -62,6 +62,7 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
   }
   public function generateAnalytics(Request $request){
     $entities = $this->getEntities();
+    //print(json_encode($entities)); die();
     $dx = $entities['dx'];
     $ou = $entities['ou'];
 
@@ -104,17 +105,24 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     );
   }
   private function getEntities(){
+
+      $storage = $this->entity_manager->getStorage('data_element');
+      $ids = $storage->getQuery()->condition('status', 1, '=')->execute();
+      $dataElements = $storage->loadMultiple($ids);
+
     $entities = [];
     $dxElementUids = [];
     $orgUnitUids = [];
-    $dataElements = DataElement::loadMultiple();
 
     foreach ($dataElements as $dx){
         array_push($dxElementUids, $dx->getDataElementUid());
     }
     $entities['dx'] = $dxElementUids;
 
-    $orgUnits = OrganisationUnit::loadMultiple();
+      $storage = $this->entity_manager->getStorage('organisation_unit');
+      $ids = $storage->getQuery()->condition('status', 1, '=')->execute();
+      $orgUnits = $storage->loadMultiple($ids);
+
     foreach ($orgUnits as $ou){
         array_push($orgUnitUids, $ou->getOrgunitUid());
     }

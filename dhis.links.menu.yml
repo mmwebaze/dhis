@@ -42,9 +42,15 @@ dhis.settings_dhis:
   parent: 'dhis.admin_dhis'
 
 dhis.metadata_fetch:
-  title: 'Metadata fetch'
+  title: 'Dhis2 Metadata fetch'
   route_name: 'dhis.metadata_fetch'
   parent: 'dhis.admin_dhis'
   description: 'Fetch metadata from a dhis2 instance.'
   weight: 20
 
+dhis.analytics_dhis:
+  title: 'Dhis2 Analytics'
+  route_name: 'dhis.analytics'
+  parent: 'dhis.admin_dhis'
+  description: 'Fetch analytic data from remote DHIS2.'
+  weight: 30
