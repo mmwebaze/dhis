@@ -15,10 +15,10 @@ class DataElementFilterForm extends FormBase{
 
     public function buildForm(array $form, FormStateInterface $form_state) {
         $form = array();
-        $form['filters']['text'] = array(
-            '#title' => $this->t('Text'),
+        $form['filters']['name'] = array(
+            '#title' => $this->t('Display Name'),
             '#type' => 'textfield',
-            '#default_value' => \Drupal::request()->get('text'),
+            '#default_value' => \Drupal::request()->get('name'),
         );
         $form['filters']['submit_apply'] = [
             '#type' => 'submit',
@@ -29,9 +29,7 @@ class DataElementFilterForm extends FormBase{
     }
     public function submitForm(array &$form, FormStateInterface $form_state) {
         $form_values = $form_state->getValues();
-        drupal_set_message(json_encode($form_values['text'], 1));
-        $params = array('text' => $form_values['text'], 'form_id' => $form_values['form_id']);
+        $params = array('name' => $form_values['name'], 'form_id' => $form_values['form_id']);
         $form_state->setRedirect('entity.data_element.collection', $params);
-        //$form_state->setRedirectUrl(Url::fromUri('internal:' . '/admin/structure/data_element', $params));
     }
 }

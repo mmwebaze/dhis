@@ -21,8 +21,9 @@ class DataElementListBuilder extends EntityListBuilder {
    */
   public function buildHeader() {
     $header['id'] = $this->t('Data element ID');
-    $header['name'] = $this->t('Name');
-    $header['deuid'] = $this->t('de uid');
+    $header['name'] = $this->t('Display Name');
+    $header['deuid'] = $this->t('DE uid');
+    $header['status'] = $this->t('Synchronizable');
     return $header + parent::buildHeader();
   }
 
@@ -41,6 +42,7 @@ class DataElementListBuilder extends EntityListBuilder {
       )
     );
       $row['deuid'] = $entity->getDataElementUid();
+      $row['status'] = $entity->isPublished();
     return $row + parent::buildRow($entity);
   }
   public function render(){
@@ -56,7 +58,7 @@ class DataElementListBuilder extends EntityListBuilder {
 
         if ($form_id && $form_id === 'DataElementFilterForm') {
             $query = \Drupal::entityQuery($this->entityTypeId);
-            $query->condition('name', $params['text'], 'CONTAINS');
+            $query->condition('name', $params['name'], 'CONTAINS');
             if ($this->limit) {
                 $query->pager($this->limit);
             }

@@ -228,8 +228,14 @@ class DataElement extends ContentEntityBase implements DataElementInterface {
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Publishing status'))
-      ->setDescription(t('A boolean indicating whether the Data element is published.'))
-      ->setDefaultValue(TRUE);
+      ->setDescription(t('A boolean indicating whether the Data element shoulded be synchronized with remote.'))
+      ->setDefaultValue(FALSE)
+        ->setDisplayOptions('form', array(
+            //'type' => 'string_textfield',
+            'weight' => -4,
+        ))
+        ->setDisplayConfigurable('form', TRUE)
+        ->setDisplayConfigurable('view', TRUE);;
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
