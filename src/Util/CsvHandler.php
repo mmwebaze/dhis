@@ -11,7 +11,6 @@ class CsvHandler
     public function __construct(FileSystem $file_system)
     {
         $this->file_location = $file_system->realpath("public://");
-        drupal_set_message($this->file_location);
     }
 
     public function createCsv(array $header, array $data)

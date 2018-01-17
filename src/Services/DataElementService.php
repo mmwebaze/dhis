@@ -4,7 +4,7 @@
 namespace Drupal\dhis\Services;
 
 use \Drupal\dhis\Util\Validator;
-use \Drupal\dhis\Util\ArrayImploder;
+use \Drupal\dhis\Util\ArrayUtil;
 
 
 class DataElementService implements DataElementServiceInterface
@@ -42,7 +42,7 @@ class DataElementService implements DataElementServiceInterface
     public function getDataElementValues($dataElementCodes = array(), $periods = array(), $orgUnits = array())
     {
         $analyticsConfig = '&tableLayout=true&columns=dx;ou&rows=pe&hideEmptyRows=true';
-        $analytics = 'analytics.json?dimension=dx:'. ArrayImploder::implodeArray($dataElementCodes) . '&dimension=pe:' .ArrayImploder::implodeArray($periods). '&dimension=ou:' .ArrayImploder::implodeArray($orgUnits).$analyticsConfig;
+        $analytics = 'analytics.json?dimension=dx:'. ArrayUtil::implodeArray($dataElementCodes) . '&dimension=pe:' .ArrayUtil::implodeArray($periods). '&dimension=ou:' .ArrayUtil::implodeArray($orgUnits).$analyticsConfig;
 
         return $this->loginService->login($analytics);
     }

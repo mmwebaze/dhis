@@ -5,6 +5,7 @@ namespace Drupal\dhis\Services;
 
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\dhis\Util\ArrayUtil;
 
 class DhisEntityService implements DhisEntityServiceInterface {
     protected $entity_manager;
@@ -57,30 +58,33 @@ class DhisEntityService implements DhisEntityServiceInterface {
                 drupal_set_message($this->t(' Unknown Dhis2 entity type'));
         }
     }
-    public function createContent($dhis_data){
+    public function createContent($analytics_data){
 
-        $data_element_storage = $this->entity_manager->getStorage('data_element');
-        $dataElementId = $data_element_storage->getQuery()->condition('deuid', 'FTRrcoaog83', '=')->execute();
-        $data_element = $data_element_storage->loadMultiple($dataElementId);
+        $arrayUtil = new ArrayUtil();
+        $rows = $arrayUtil->reformatDhisAnalyticData($analytics_data);
+
+        $header = ['de_uid' => 0, 'de_name' => 1, 'code' => 2,'org_uid' => 3, 'org_name' => 4,
+            'org_code' => 5, 'period' => 6, 'value' => 7];
 
         $node_storage = $this->entity_manager->getStorage('node');
+        $data_element_storage = $this->entity_manager->getStorage('data_element');
 
-        print(json_encode(current($data_element)->id(), 1));
-        $node_storage->create([
-            'type' => 'dhis_data',
-            'title'       => 'Druplicon test',
-            'field_dataelement' => ['target_id' => current($data_element)->id()],
-            'user_id' => ['target_id' => $this->current_user->id()],
-        ])->save();
-
-        /*$storage = $this->entity_manager->getStorage('node');
-        $nodeIds = $storage->getQuery()->condition('type', 'dhis_data', '=')->execute();
-        $nodes = $storage->loadMultiple($nodeIds);
-        //print(json_encode($nodes, 1));
-
-        foreach ($nodes as $node){
-            $dataElementRef = $node->get('field_dataelement')->getValue();
-            print(json_encode($dataElementRef[0]['target_id'], 1));
-        }*/
+        foreach ($rows as $row){
+            $de_uid = $row[$header['de_uid']];
+            $de_name = $row[$header['de_name']];
+            $org_uid = $row[$header['org_uid']];
+            $country = $row[$header['country']];
+            $country_code = $row[$header['country_code']];
+            $value = $row[$header['value']];
+            $dataElementId = $data_element_storage->getQuery()->condition('deuid', $de_uid, '=')->execute();
+            $data_element = $data_element_storage->loadMultiple($dataElementId);
+            $node_storage->create([
+                'type' => 'dhis_data',
+                'title'       => $de_name,
+                'field_value' => $value,
+                'field_dataelement' => ['target_id' => current($data_element)->id()],
+                'user_id' => ['target_id' => $this->current_user->id()],
+            ])->save();
+        }
     }
 }
