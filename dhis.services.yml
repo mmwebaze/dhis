@@ -17,4 +17,4 @@ services:
 
   dhis_entity:
     class: Drupal\dhis\Services\DhisEntityService
-    arguments: ['@entity_type.manager']
+    arguments: ['@entity_type.manager', '@current_user']

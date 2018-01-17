@@ -4,12 +4,15 @@ namespace Drupal\dhis\Services;
 
 
 use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Session\AccountInterface;
 
-class DhisEntityService{
+class DhisEntityService implements DhisEntityServiceInterface {
     protected $entity_manager;
+    protected $current_user;
 
-    public function __construct(EntityTypeManager $entity_manager){
+    public function __construct(EntityTypeManager $entity_manager, AccountInterface $current_user){
         $this->entity_manager = $entity_manager;
+        $this->current_user = $current_user;
     }
 
     /**
@@ -53,5 +56,31 @@ class DhisEntityService{
             default:
                 drupal_set_message($this->t(' Unknown Dhis2 entity type'));
         }
+    }
+    public function createContent($dhis_data){
+
+        $data_element_storage = $this->entity_manager->getStorage('data_element');
+        $dataElementId = $data_element_storage->getQuery()->condition('deuid', 'FTRrcoaog83', '=')->execute();
+        $data_element = $data_element_storage->loadMultiple($dataElementId);
+
+        $node_storage = $this->entity_manager->getStorage('node');
+
+        print(json_encode(current($data_element)->id(), 1));
+        $node_storage->create([
+            'type' => 'dhis_data',
+            'title'       => 'Druplicon test',
+            'field_dataelement' => ['target_id' => current($data_element)->id()],
+            'user_id' => ['target_id' => $this->current_user->id()],
+        ])->save();
+
+        /*$storage = $this->entity_manager->getStorage('node');
+        $nodeIds = $storage->getQuery()->condition('type', 'dhis_data', '=')->execute();
+        $nodes = $storage->loadMultiple($nodeIds);
+        //print(json_encode($nodes, 1));
+
+        foreach ($nodes as $node){
+            $dataElementRef = $node->get('field_dataelement')->getValue();
+            print(json_encode($dataElementRef[0]['target_id'], 1));
+        }*/
     }
 }

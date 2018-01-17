@@ -73,6 +73,10 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
 
     $data['rows'] = $analyticsData['rows'];
 
+    if (count($data['rows']) != 0){
+        $this->dhis_entity->createContent($data['rows']);
+    }
+
     $data['dimensions'] = $analyticsData['metaData']['dimensions'];
 
     $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Value'];
