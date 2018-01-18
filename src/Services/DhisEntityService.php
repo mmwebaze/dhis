@@ -58,10 +58,7 @@ class DhisEntityService implements DhisEntityServiceInterface {
                 drupal_set_message($this->t(' Unknown Dhis2 entity type'));
         }
     }
-    public function createContent($analytics_data){
-
-        $arrayUtil = new ArrayUtil();
-        $rows = $arrayUtil->reformatDhisAnalyticData($analytics_data);
+    public function createContent($rows){
 
         $header = ['de_uid' => 0, 'de_name' => 1, 'code' => 2,'org_uid' => 3, 'org_name' => 4,
             'org_code' => 5, 'period' => 6, 'value' => 7];
@@ -85,6 +82,15 @@ class DhisEntityService implements DhisEntityServiceInterface {
                 'field_dataelement' => ['target_id' => current($data_element)->id()],
                 'user_id' => ['target_id' => $this->current_user->id()],
             ])->save();
+        }
+    }
+    public function deleteContent(){
+        $storage = $this->entity_manager->getStorage('node');
+        $ids = $storage->getQuery()->condition('type', 'dhis_data', '=')->execute();
+        $dhis_data = $storage->loadMultiple($ids);
+
+        foreach ($dhis_data as $data){
+            $data->delete();
         }
     }
 }

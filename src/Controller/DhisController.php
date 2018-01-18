@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\dhis\Entity\OrganisationUnit;
 use Drupal\dhis\Entity\DataElement;
 use Drupal\dhis\Services\DhisEntityService;
+use Drupal\dhis\Util\ArrayUtil;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\dhis\Services\AnalyticService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -73,16 +74,18 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     $data = [];
 
     $data['rows'] = $analyticsData['rows'];
+      $arrayUtil = new ArrayUtil();
+      $rows = $arrayUtil->reformatDhisAnalyticData($analyticsData);
 
-    if (count($data['rows']) != 0){
-        $this->dhis_entity->createContent($analyticsData/*$analyticsData['rows'][0]*/);
-    }
+    /*if (count($data['rows']) != 0){
+        $this->dhis_entity->createContent($rows);
+    }*/
 
     $data['dimensions'] = $analyticsData['metaData']['dimensions'];
 
-    $header = ['de uid', 'de name', 'DE Code', '#','Country uid', 'Country', 'Country code', '#', 'Value'];
+    $header = ['de uid', 'de name', 'DE Code','Country uid', 'Country', 'Country code', 'Year','Value'];
     $csvHandler = new CsvHandler($this->file_system);
-    $csvHandler->createCsv($header, $analyticsData['rows']);
+    $csvHandler->createCsv($header, $rows);
 
     $output = array(
         '#theme' => 'table',
@@ -90,7 +93,7 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
         //'#cache' => ['disabled' => TRUE],
         '#caption' => ' Data pulled',
         '#header' => $header,
-        '#rows' => $data['rows'],
+        '#rows' => $rows,
     );
 
     $this->content['table'] = $output;
