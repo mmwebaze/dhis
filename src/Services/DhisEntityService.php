@@ -5,7 +5,6 @@ namespace Drupal\dhis\Services;
 
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\dhis\Util\ArrayUtil;
 
 class DhisEntityService implements DhisEntityServiceInterface {
     protected $entity_manager;

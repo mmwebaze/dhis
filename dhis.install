@@ -85,7 +85,8 @@ function dhis_uninstall(){
             deleteVocabulary($entity);
         }
     }
-    $entity_settings = ['OrganisationUnit_settings', 'DataElement_settings'];
+    $entity_settings = ['OrganisationUnit_settings', 'DataElement_settings',
+        'field.storage.node.value','field.field.node.dhis_data.value'];
 
     foreach($entity_settings as $entity_setting){
         \Drupal::configFactory()->getEditable($entity_setting)->delete();
