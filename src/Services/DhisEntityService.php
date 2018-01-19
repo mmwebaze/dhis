@@ -92,4 +92,10 @@ class DhisEntityService implements DhisEntityServiceInterface {
             $data->delete();
         }
     }
+    public function getDhisContentType(){
+        $storage = $this->entity_manager->getStorage('node_type');
+        $ids = $storage->getQuery()->condition('type', 'dhis_data', '=')->execute();
+        $content_types = $storage->loadMultiple($ids);
+        return current($content_types);
+    }
 }
