@@ -40,7 +40,6 @@ function drush_dhis_remove_entities($arg = NULL){
             $dhisService->removeDhisEntities('organisation_unit');
             break;
         default:
-            $dhisService->getDhisContentType();
             drush_print(dt('Wrong argument \''.$arg.'\'. Possible arguments: dx, ou or all.'));
     }
 }

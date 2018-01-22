@@ -3,6 +3,7 @@ status: true
 dependencies:
   config:
     - field.field.node.dhis_data.body
+    - field.field.node.dhis_data.data_element
     - node.type.dhis_data
   module:
     - text
@@ -17,6 +18,13 @@ content:
     type: text_default
     weight: 101
     settings: {  }
+    third_party_settings: {  }
+  data_element:
+    type: entity_reference_label
+    label: above
+    weight: 10
+    settings:
+      link: true
     third_party_settings: {  }
   links:
     weight: 100

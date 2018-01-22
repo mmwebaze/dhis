@@ -34,39 +34,50 @@ class DhisSettingsForm extends ConfigFormBase {
 
     $form['dhis'] = array(
       '#type' => 'fieldset',
-      '#title' => $this->t('DHIS2 Settings'),
+      '#title' => $this->t('DHIS 2 Settings'),
     );
 
     $form['dhis']['link'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('DHIS Link'),
+      '#title' => $this->t('DHIS 2 Link'),
       '#default_value' => $config->get('dhis.link'),
       '#required' => TRUE,
     );
 
+    $form['dhis']['empty_value'] =  array(
+        '#type' => 'checkbox',
+        '#title' => $this->t('Exclude empty records'),
+        '#default_value' => $config->get('dhis.empty_value'),
+    );
+    $form['dhis']['auto_sync'] =  array(
+        '#type' => 'checkbox',
+        '#title' => $this->t('Automatic Sync'),
+        '#default_value' => $config->get('dhis.auto_sync'),
+    );
+
     $form['dhis']['username'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('DHIS Username'),
+      '#title' => $this->t('DHIS 2 Username'),
       '#default_value' => $config->get('dhis.username'),
       '#required' => TRUE,
     );
 
     $form['dhis']['password'] = array(
       '#type' => 'password',
-      '#title' => $this->t('DHIS Password'),
+      '#title' => $this->t('DHIS 2 Password'),
       '#default_value' => $config->get('dhis.password'),
       '#required' => TRUE,
     );
 
     $form['metadata'] = array(
       '#type' => 'fieldset',
-      '#title' => $this->t('DHIS2 Metadata to import'),
+      '#title' => $this->t('DHIS 2 Metadata to import'),
     );
-    $form['metadata']['orgUnitGrp'] = array(
+    /*$form['metadata']['orgUnitGrp'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Organisation Unit Groups'),
       '#default_value' => $config->get('dhis.orgUnitGrp'),
-    );
+    );*/
     $form['metadata']['orgUnits'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Organisation Units'),
@@ -90,9 +101,11 @@ class DhisSettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state){
     $config = $this->config('dhis.settings');
     $config->set('dhis.link', $form_state->getValue('link'));
+    $config->set('dhis.empty_value', $form_state->getValue('empty_value'));
+    $config->set('dhis.auto_sync', $form_state->getValue('auto_sync'));
     $config->set('dhis.username', $form_state->getValue('username'));
     $config->set('dhis.password', $form_state->getValue('password'));
-    $config->set('dhis.orgUnitGrp', $form_state->getValue('orgUnitGrp'));
+    //$config->set('dhis.orgUnitGrp', $form_state->getValue('orgUnitGrp'));
     $config->set('dhis.orgUnits', $form_state->getValue('orgUnits'));
     $config->set('dhis.dataElements', $form_state->getValue('dataElements'));
     $config->set('dhis.indicators', $form_state->getValue('indicators'));

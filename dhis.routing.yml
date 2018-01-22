@@ -1,5 +1,5 @@
 dhis.settings:
-  path: '/dhis/settings'
+  path: '/admin/config/dhis/settings'
   defaults:
     _form: '\Drupal\dhis\Form\DhisSettingsForm'
     _title: 'DHIS2 Settings'
