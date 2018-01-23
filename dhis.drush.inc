@@ -23,7 +23,7 @@ function dhis_drush_command(){
 
 function drush_dhis_remove_entities($arg = NULL){
     $tokens = ['@arg' => $arg];
-    $dhisService = \Drupal::service("dhis_entity");
+    $dhisService = \Drupal::service("dhis_service");
 
     switch ($arg){
         case 'dx':
