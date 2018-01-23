@@ -102,7 +102,7 @@ class DhisSettingsForm extends ConfigFormBase {
     $config = $this->config('dhis.settings');
     $config->set('dhis.link', $form_state->getValue('link'));
     $config->set('dhis.empty_value', $form_state->getValue('empty_value'));
-    $config->set('dhis.auto_sync', $form_state->getValue('auto_sync'));
+      $config->set('dhis.empty_value', $form_state->getValue('empty_value'));
     $config->set('dhis.username', $form_state->getValue('username'));
     $config->set('dhis.password', $form_state->getValue('password'));
     //$config->set('dhis.orgUnitGrp', $form_state->getValue('orgUnitGrp'));

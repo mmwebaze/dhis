@@ -3,16 +3,22 @@
 namespace Drupal\dhis\Services;
 
 
+use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\dhis\Util\ArrayUtil;
 
-class DhisEntityService implements DhisEntityServiceInterface {
+class DhisService implements DhisServiceInterface {
     protected $entity_manager;
     protected $current_user;
+    protected $config_factory;
+    protected $arrayUtil;
 
-    public function __construct(EntityTypeManager $entity_manager, AccountInterface $current_user){
+    public function __construct(EntityTypeManager $entity_manager, AccountInterface $current_user, ConfigFactory $config_factory){
         $this->entity_manager = $entity_manager;
         $this->current_user = $current_user;
+        $this->config_factory = $config_factory->getEditable('dhis.settings');
+        $this->arrayUtil = new ArrayUtil();
     }
 
     /**
@@ -64,6 +70,7 @@ class DhisEntityService implements DhisEntityServiceInterface {
 
         $node_storage = $this->entity_manager->getStorage('node');
         $data_element_storage = $this->entity_manager->getStorage('data_element');
+        $org_unit_storage = $this->entity_manager->getStorage('organisation_unit');
 
         foreach ($rows as $row){
             $de_uid = $row[$header['de_uid']];
@@ -72,13 +79,18 @@ class DhisEntityService implements DhisEntityServiceInterface {
             $country = $row[$header['country']];
             $country_code = $row[$header['country_code']];
             $value = $row[$header['value']];
+
             $dataElementId = $data_element_storage->getQuery()->condition('deuid', $de_uid, '=')->execute();
             $data_element = $data_element_storage->loadMultiple($dataElementId);
+            $orgUnitId = $org_unit_storage->getQuery()->condition('orgunituid', $org_uid, '=')->execute();
+            $org_unit = $org_unit_storage->loadMultiple($orgUnitId);
+
             $node_storage->create([
                 'type' => 'dhis_data',
                 'title'       => $de_name,
-                'field_value' => $value,
-                'field_dataelement' => ['target_id' => current($data_element)->id()],
+                'value' => $value,
+                'data_element' => ['target_id' => current($data_element)->id()],
+                'organisation_unit' => ['target_id' => current($org_unit)->id()],
                 'user_id' => ['target_id' => $this->current_user->id()],
             ])->save();
         }
@@ -97,5 +109,10 @@ class DhisEntityService implements DhisEntityServiceInterface {
         $ids = $storage->getQuery()->condition('type', 'dhis_data', '=')->execute();
         $content_types = $storage->loadMultiple($ids);
         return current($content_types);
+    }
+    public function analyticData($analyticsData){
+       $exclude_value = $this->config_factory->get('dhis.empty_value');
+
+        return $this->arrayUtil->reformatDhisAnalyticData($analyticsData, $exclude_value);
     }
 }

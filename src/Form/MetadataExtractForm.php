@@ -21,13 +21,13 @@ use Drupal\Core\Entity\EntityTypeManager;
 class MetadataExtractForm extends FormBase implements ContainerInjectionInterface {
   protected $config_factory;
   private $content;
-    private $file_system;
-    private $entity_manager;
+  private $file_system;
+  private $entity_manager;
 
   public function __construct(ConfigFactory $config_factory, FileSystem $file_system, EntityTypeManager $entity_manager) {
     $this->config_factory = $config_factory;
-      $this->file_system = $file_system;
-      $this->entity_manager = $entity_manager;
+    $this->file_system = $file_system;
+    $this->entity_manager = $entity_manager;
   }
   /**
    * {@inheritdoc}
@@ -83,8 +83,8 @@ class MetadataExtractForm extends FormBase implements ContainerInjectionInterfac
   public static function create(ContainerInterface $container){
     return new static(
       $container->get('config.factory'),
-        $container->get('file_system'),
-        $container->get('entity_type.manager')
+      $container->get('file_system'),
+      $container->get('entity_type.manager')
     );
   }
   private function createVocabulary($metadata, $vocabularyName){

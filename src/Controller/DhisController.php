@@ -7,7 +7,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\dhis\Entity\OrganisationUnit;
 use Drupal\dhis\Entity\DataElement;
-use Drupal\dhis\Services\DhisEntityService;
+use Drupal\dhis\Services\DhisService;
 use Drupal\dhis\Util\ArrayUtil;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\dhis\Services\AnalyticService;
@@ -20,14 +20,14 @@ use Drupal\Core\Path\CurrentPathStack;
 
 class DhisController extends ControllerBase implements ContainerInjectionInterface {
 
-  protected $dhis_entity;
+  protected $dhis_service;
   private $content = [];
   private $dhis_analytics;
   private $file_system;
   private $path_current;
 
-  public function __construct(DhisEntityService $dhis_entity, AnalyticService $dhis_analytics, FileSystem $file_system, CurrentPathStack $path_current) {
-    $this->dhis_entity = $dhis_entity;
+  public function __construct(DhisService $dhis_service, AnalyticService $dhis_analytics, FileSystem $file_system, CurrentPathStack $path_current) {
+    $this->dhis_service = $dhis_service;
     $this->dhis_analytics = $dhis_analytics;
     $this->file_system = $file_system;
     $this->path_current = $path_current;
@@ -64,8 +64,8 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
   }
   public function generateAnalytics(Request $request){
 
-    $dx = $this->dhis_entity->getDhisEntities('data_element');
-    $ou = $this->dhis_entity->getDhisEntities('organisation_unit');
+    $dx = $this->dhis_service->getDhisEntities('data_element');
+    $ou = $this->dhis_service->getDhisEntities('organisation_unit');
 
     $pe = ['2013', '2014', '2015', '2016','2017'];
 
@@ -74,12 +74,11 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
     $data = [];
 
     $data['rows'] = $analyticsData['rows'];
-      $arrayUtil = new ArrayUtil();
-      $rows = $arrayUtil->reformatDhisAnalyticData($analyticsData);
+    $rows = $this->dhis_service->analyticData($analyticsData);
 
-    /*if (count($data['rows']) != 0){
-        $this->dhis_entity->createContent($rows);
-    }*/
+    if (count($data['rows']) != 0){
+        $this->dhis_service->createContent($rows);
+    }
 
     $data['dimensions'] = $analyticsData['metaData']['dimensions'];
 
@@ -107,7 +106,7 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
   }
   public static function create(ContainerInterface $container){
     return new static(
-      $container->get('dhis_entity'),
+      $container->get('dhis_service'),
       $container->get('dhis_analytics'),
       $container->get('file_system'),
       $container->get('path.current')

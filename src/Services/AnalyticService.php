@@ -18,7 +18,6 @@ class AnalyticService implements AnalyticServiceInterface {
     $ou = implode(';', $orgUnits);
     $pe = implode(';', $periods);
     $analyticsEndpoint = $this->analyticsEndpoint.'?dimension=dx:'.$dx.'&dimension=ou:'.$ou.'&dimension=pe:'.$pe.'&tableLayout=true&rows=dx;ou&columns=pe';
-      drupal_set_message($analyticsEndpoint);
     return $this->loginService->login($analyticsEndpoint);
   }
 }
