@@ -15,14 +15,19 @@ class DataElementFilterForm extends FormBase{
 
     public function buildForm(array $form, FormStateInterface $form_state) {
         $form = array();
+        $form['#attached']['library'][] = 'dhis/dhis_dhis';
         $form['filters']['name'] = array(
             '#title' => $this->t('Display Name'),
             '#type' => 'textfield',
             '#default_value' => \Drupal::request()->get('name'),
+            '#prefix' => '<div class="dhis-filter-name">',
+            '#suffix' => '</div>',
         );
         $form['filters']['submit_apply'] = [
             '#type' => 'submit',
             '#value' => t('Filter'),
+            '#prefix' => '<div class="dhis-filter-submit">',
+            '#suffix' => '</div>',
         ];
 
         return $form;

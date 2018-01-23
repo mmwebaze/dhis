@@ -17,3 +17,13 @@
     display:inline;
     width:auto;
 }
+
+/*Org unit and data element filter forms*/
+.dhis-filter-name label{
+    float: none;
+    text-align: left;
+}
+
+.dhis-filter-submit{
+    padding-bottom: 5px;
+}
