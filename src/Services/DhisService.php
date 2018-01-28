@@ -22,30 +22,39 @@ class DhisService implements DhisServiceInterface {
     }
 
     /**
-     * @param $entity_type $entity_type can take on 'data_element or organisation_unit'
+     * @param $entity_type $entity_type can take on 'period, data_element or organisation_unit'
      *
-     * @return array of dhis2 uids
+     * @return array of dhis2 uids or periods
      *
      */
-    public function getDhisEntities($entity_type){
-        $entityUids = [];
+    public function getDimensions($entity_type){
+        $dimensions = [];
         $storage = $this->entity_manager->getStorage($entity_type);
-        $ids = $storage->getQuery()->condition('status', 1, '=')->execute();
+
+        $query = $storage->getQuery();//->condition('status', 1, '=')->execute();
+
+        if ($entity_type == 'taxonomy_term'){
+            $ids = $query->condition('activate', 1, '=')
+                ->condition('vid', 'periods', '=')->execute();
+        }
+        else{
+            $ids = $query->condition('status', 1, '=')->execute();
+        }
         $entities = $storage->loadMultiple($ids);
 
         foreach ($entities as $entity){
             if ($entity_type == 'data_element'){
-                array_push($entityUids, $entity->getDataElementUid());
+                array_push($dimensions, $entity->getDataElementUid());
             }
             elseif ($entity_type == 'organisation_unit'){
-                array_push($entityUids, $entity->getOrgunitUid());
+                array_push($dimensions, $entity->getOrgunitUid());
             }
             else{
-
+                array_push($dimensions, $entity->label());
             }
         }
 
-        return $entityUids;
+        return $dimensions;
     }
     public function removeDhisEntities($entity_type){
         $storage = $this->entity_manager->getStorage($entity_type);
@@ -77,6 +86,7 @@ class DhisService implements DhisServiceInterface {
             $de_name = $row[$header['de_name']];
             $org_uid = $row[$header['org_uid']];
             $country = $row[$header['country']];
+            $period = $row[$header['period']];
             $country_code = $row[$header['country_code']];
             $value = $row[$header['value']];
 
@@ -92,6 +102,7 @@ class DhisService implements DhisServiceInterface {
                 'data_element' => ['target_id' => current($data_element)->id()],
                 'organisation_unit' => ['target_id' => current($org_unit)->id()],
                 'user_id' => ['target_id' => $this->current_user->id()],
+                'period' => ['target_id' => $this->getTermId($period)],
             ])->save();
         }
     }
@@ -111,8 +122,29 @@ class DhisService implements DhisServiceInterface {
         return current($content_types);
     }
     public function analyticData($analyticsData){
-       $exclude_value = $this->config_factory->get('dhis.empty_value');
 
-        return $this->arrayUtil->reformatDhisAnalyticData($analyticsData, $exclude_value);
+       $exclude_value = $this->config_factory->get('dhis.empty_value');
+       $api_version = $this->config_factory->get('dhis.api_version');
+
+        return $this->arrayUtil->reformatDhisAnalyticData($analyticsData, $exclude_value, $api_version);
+    }
+    private function getTermId($name){
+        $storage = $this->entity_manager->getStorage('taxonomy_term');
+        $tids = $storage->getQuery()->condition('vid', "periods")
+            ->condition('name', $name)->execute();
+        $terms = $storage->loadMultiple($tids);
+        if (count($terms) == 0){
+            $storage->create([
+                'name' => $name,
+                'vid' => 'periods',
+                'description' => $name,
+                'activate' => 1,
+            ])->save();
+            $tids = $storage->getQuery()->condition('vid', "periods")
+                ->condition('name', $name)->execute();
+            $terms = $storage->loadMultiple($tids);
+            return current($terms)->id();
+        }
+        return current($terms)->id();
     }
 }

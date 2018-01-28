@@ -20,12 +20,7 @@ function dhis_install(){
     $file_contents = file_get_contents($module_path.'/dhis.periods.yml');
     $periods = Yaml::parse($file_contents);
 
-    $vid = 'dhis_period';
-    $vocabulary = Vocabulary::create([
-        'name' => 'Dhis2 Periods',
-        'vid' => $vid, 'description' => 'DHIS2 Relative Periods',
-        'activate' => 1
-    ])->save();
+    $vid = 'periods';
 
     FieldStorageConfig::create(
         array(
@@ -64,7 +59,7 @@ function dhis_install(){
  */
 function dhis_uninstall(){
     print('Starting uninstall process');
-    $entities = ['data_element', 'organisation_unit', 'dhis_period'];
+    $entities = ['data_element', 'organisation_unit', 'periods'];
     foreach($entities as $entity){
         $vids = [];
         try{
@@ -81,12 +76,13 @@ function dhis_uninstall(){
             print($e->getMessage());
         }
 
-        if ($entity == 'dhis_period'){
+        if ($entity == 'periods'){
             deleteVocabulary($entity);
         }
     }
     $entity_settings = ['OrganisationUnit_settings', 'DataElement_settings',
-        'field.storage.node.value','field.field.node.dhis_data.value'];
+        'field.storage.node.value','field.field.node.dhis_data.value',
+        'field.storage.node.data_source','field.field.node.dhis_data.data_source'];
 
     foreach($entity_settings as $entity_setting){
         \Drupal::configFactory()->getEditable($entity_setting)->delete();

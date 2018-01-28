@@ -49,6 +49,11 @@ class DhisSettingsForm extends ConfigFormBase {
         '#title' => $this->t('Exclude empty records'),
         '#default_value' => $config->get('dhis.empty_value'),
     );
+      $form['dhis']['api_version'] =  array(
+          '#type' => 'checkbox',
+          '#title' => $this->t('New Api Version'),
+          '#default_value' => $config->get('dhis.api_version'),
+      );
     $form['dhis']['auto_sync'] =  array(
         '#type' => 'checkbox',
         '#title' => $this->t('Automatic Sync'),
@@ -73,11 +78,11 @@ class DhisSettingsForm extends ConfigFormBase {
       '#type' => 'fieldset',
       '#title' => $this->t('DHIS 2 Metadata to import'),
     );
-    /*$form['metadata']['orgUnitGrp'] = array(
+    $form['metadata']['orgUnitGrp'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Organisation Unit Groups'),
       '#default_value' => $config->get('dhis.orgUnitGrp'),
-    );*/
+    );
     $form['metadata']['orgUnits'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Organisation Units'),
@@ -102,10 +107,11 @@ class DhisSettingsForm extends ConfigFormBase {
     $config = $this->config('dhis.settings');
     $config->set('dhis.link', $form_state->getValue('link'));
     $config->set('dhis.empty_value', $form_state->getValue('empty_value'));
-      $config->set('dhis.empty_value', $form_state->getValue('empty_value'));
+    $config->set('dhis.auto_sync', $form_state->getValue('auto_sync'));
+    $config->set('dhis.api_version', $form_state->getValue('api_version'));
     $config->set('dhis.username', $form_state->getValue('username'));
     $config->set('dhis.password', $form_state->getValue('password'));
-    //$config->set('dhis.orgUnitGrp', $form_state->getValue('orgUnitGrp'));
+    $config->set('dhis.orgUnitGrp', $form_state->getValue('orgUnitGrp'));
     $config->set('dhis.orgUnits', $form_state->getValue('orgUnits'));
     $config->set('dhis.dataElements', $form_state->getValue('dataElements'));
     $config->set('dhis.indicators', $form_state->getValue('indicators'));

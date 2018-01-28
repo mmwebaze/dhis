@@ -14,9 +14,13 @@ class ArrayUtil
 
         return implode($separator, $arrayToImplode);
     }
-    public function reformatDhisAnalyticData($analytics_data, $exclude_empty_value = TRUE){
+    public function reformatDhisAnalyticData($analytics_data, $exclude_empty_value = TRUE, $api_version = TRUE){
+
         $rows_final = [];
-        $periods = $analytics_data['metaData']['pe'];
+        $periods = $analytics_data['metaData']['dimensions']['pe'];
+        if (!$api_version){
+            $periods = $analytics_data['metaData']['pe'];
+        }
 
         $rows = $analytics_data['rows'];
         foreach ($rows as $k => $row){

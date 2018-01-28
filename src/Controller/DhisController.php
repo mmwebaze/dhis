@@ -64,16 +64,16 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
   }
   public function generateAnalytics(Request $request){
 
-    $dx = $this->dhis_service->getDhisEntities('data_element');
-    $ou = $this->dhis_service->getDhisEntities('organisation_unit');
-
-    $pe = ['2013', '2014', '2015', '2016','2017'];
-
+    $dx = $this->dhis_service->getDimensions('data_element');
+    $ou = $this->dhis_service->getDimensions('organisation_unit');
+    $pe = $this->dhis_service->getDimensions('taxonomy_term');
+      
     $analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
 
     $data = [];
 
     $data['rows'] = $analyticsData['rows'];
+
     $rows = $this->dhis_service->analyticData($analyticsData);
 
     if (count($data['rows']) != 0){
