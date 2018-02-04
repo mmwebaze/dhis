@@ -12,47 +12,54 @@ use Drupal\Core\Url;
  *
  * @ingroup dhis
  */
-class OrganisationUnitListBuilder extends EntityListBuilder {
+class OrganisationUnitListBuilder extends EntityListBuilder
+{
 
-  use LinkGeneratorTrait;
+    use LinkGeneratorTrait;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function buildHeader() {
-    $header['id'] = $this->t('Organisation unit ID');
-    $header['name'] = $this->t('Display Name');
-    $header['orgunituid'] = $this->t('Org unit uid');
-      $header['status'] = $this->t('Synchronizable');
-    return $header + parent::buildHeader();
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function buildHeader()
+    {
+        $header['id'] = $this->t('Organisation unit ID');
+        $header['name'] = $this->t('Display Name');
+        $header['orgunituid'] = $this->t('Org unit uid');
+        $header['status'] = $this->t('Synchronizable');
+        return $header + parent::buildHeader();
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function buildRow(EntityInterface $entity) {
-    /* @var $entity \Drupal\dhis\Entity\OrganisationUnit */
-    $row['id'] = $entity->id();
-    $row['name'] = $this->l(
-      $entity->label(),
-      new Url(
-        'entity.organisation_unit.edit_form', array(
-          'organisation_unit' => $entity->id(),
-        )
-      )
-    );
-    $row['orgunituid'] = $entity->getOrgunitUid();
-      $row['status'] = $entity->isPublished();
-    return $row + parent::buildRow($entity);
-  }
-    public function render(){
+    /**
+     * {@inheritdoc}
+     */
+    public function buildRow(EntityInterface $entity)
+    {
+        /* @var $entity \Drupal\dhis\Entity\OrganisationUnit */
+        $row['id'] = $entity->id();
+        $row['name'] = $this->l(
+            $entity->label(),
+            new Url(
+                'entity.organisation_unit.edit_form', array(
+                    'organisation_unit' => $entity->id(),
+                )
+            )
+        );
+        $row['orgunituid'] = $entity->getOrgunitUid();
+        $row['status'] = $entity->isPublished();
+        return $row + parent::buildRow($entity);
+    }
+
+    public function render()
+    {
         $form = \Drupal::formBuilder()->getForm('Drupal\dhis\Form\OrganisationUnitFilterForm');
         $build['form'] = $form;
 
         $build += parent::render();
         return $build;
     }
-    protected function getEntityIds() {
+
+    protected function getEntityIds()
+    {
         $params = \Drupal::request()->query->all();
         $form_id = $params['form_id'];
 
@@ -63,8 +70,7 @@ class OrganisationUnitListBuilder extends EntityListBuilder {
                 $query->pager($this->limit);
             }
             $result = $query->execute();
-        }
-        else {
+        } else {
             $result = parent::getEntityIds();
         }
         return $result;

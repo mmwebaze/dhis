@@ -9,7 +9,8 @@ use Drupal\Core\Entity\ContentEntityDeleteForm;
  *
  * @ingroup dhis
  */
-class DataElementDeleteForm extends ContentEntityDeleteForm {
+class DataElementDeleteForm extends ContentEntityDeleteForm
+{
 
 
 }

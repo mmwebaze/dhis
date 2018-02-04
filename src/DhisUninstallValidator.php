@@ -6,13 +6,16 @@ use Drupal\Core\Extension\ModuleUninstallValidatorInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
-class DhisUninstallValidator implements ModuleUninstallValidatorInterface {
+class DhisUninstallValidator implements ModuleUninstallValidatorInterface
+{
     use StringTranslationTrait;
     private $entityTypeManager;
 
-    public function __construct(EntityTypeManager $entityTypeManager){
+    public function __construct(EntityTypeManager $entityTypeManager)
+    {
         $this->entityTypeManager = $entityTypeManager;
     }
+
     public function validate($module)
     {
         $reasons = [];

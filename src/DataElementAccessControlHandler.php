@@ -12,36 +12,39 @@ use Drupal\Core\Access\AccessResult;
  *
  * @see \Drupal\dhis\Entity\DataElement.
  */
-class DataElementAccessControlHandler extends EntityAccessControlHandler {
+class DataElementAccessControlHandler extends EntityAccessControlHandler
+{
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\dhis\Entity\DataElementInterface $entity */
-    switch ($operation) {
-      case 'view':
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished data element entities');
+    /**
+     * {@inheritdoc}
+     */
+    protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account)
+    {
+        /** @var \Drupal\dhis\Entity\DataElementInterface $entity */
+        switch ($operation) {
+            case 'view':
+                if (!$entity->isPublished()) {
+                    return AccessResult::allowedIfHasPermission($account, 'view unpublished data element entities');
+                }
+                return AccessResult::allowedIfHasPermission($account, 'view published data element entities');
+
+            case 'update':
+                return AccessResult::allowedIfHasPermission($account, 'edit data element entities');
+
+            case 'delete':
+                return AccessResult::allowedIfHasPermission($account, 'delete data element entities');
         }
-        return AccessResult::allowedIfHasPermission($account, 'view published data element entities');
 
-      case 'update':
-        return AccessResult::allowedIfHasPermission($account, 'edit data element entities');
-
-      case 'delete':
-        return AccessResult::allowedIfHasPermission($account, 'delete data element entities');
+        // Unknown operation, no opinion.
+        return AccessResult::neutral();
     }
 
-    // Unknown operation, no opinion.
-    return AccessResult::neutral();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'add data element entities');
-  }
+    /**
+     * {@inheritdoc}
+     */
+    protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL)
+    {
+        return AccessResult::allowedIfHasPermission($account, 'add data element entities');
+    }
 
 }

@@ -12,47 +12,54 @@ use Drupal\Core\Url;
  *
  * @ingroup dhis
  */
-class DataElementListBuilder extends EntityListBuilder {
+class DataElementListBuilder extends EntityListBuilder
+{
 
-  use LinkGeneratorTrait;
+    use LinkGeneratorTrait;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function buildHeader() {
-    $header['id'] = $this->t('Data element ID');
-    $header['name'] = $this->t('Display Name');
-    $header['deuid'] = $this->t('DE uid');
-    $header['status'] = $this->t('Synchronizable');
-    return $header + parent::buildHeader();
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function buildHeader()
+    {
+        $header['id'] = $this->t('Data element ID');
+        $header['name'] = $this->t('Display Name');
+        $header['deuid'] = $this->t('DE uid');
+        $header['status'] = $this->t('Synchronizable');
+        return $header + parent::buildHeader();
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function buildRow(EntityInterface $entity) {
-    /* @var $entity \Drupal\dhis\Entity\DataElement */
-    $row['id'] = $entity->id();
-    $row['name'] = $this->l(
-      $entity->label(),
-      new Url(
-        'entity.data_element.edit_form', array(
-          'data_element' => $entity->id(),
-        )
-      )
-    );
-      $row['deuid'] = $entity->getDataElementUid();
-      $row['status'] = $entity->isPublished();
-    return $row + parent::buildRow($entity);
-  }
-  public function render(){
-      $form = \Drupal::formBuilder()->getForm('Drupal\dhis\Form\DataElementFilterForm');
-      $build['form'] = $form;
+    /**
+     * {@inheritdoc}
+     */
+    public function buildRow(EntityInterface $entity)
+    {
+        /* @var $entity \Drupal\dhis\Entity\DataElement */
+        $row['id'] = $entity->id();
+        $row['name'] = $this->l(
+            $entity->label(),
+            new Url(
+                'entity.data_element.edit_form', array(
+                    'data_element' => $entity->id(),
+                )
+            )
+        );
+        $row['deuid'] = $entity->getDataElementUid();
+        $row['status'] = $entity->isPublished();
+        return $row + parent::buildRow($entity);
+    }
 
-      $build += parent::render();
-      return $build;
-  }
-    protected function getEntityIds() {
+    public function render()
+    {
+        $form = \Drupal::formBuilder()->getForm('Drupal\dhis\Form\DataElementFilterForm');
+        $build['form'] = $form;
+
+        $build += parent::render();
+        return $build;
+    }
+
+    protected function getEntityIds()
+    {
         $params = \Drupal::request()->query->all();
         $form_id = $params['form_id'];
 
@@ -63,8 +70,7 @@ class DataElementListBuilder extends EntityListBuilder {
                 $query->pager($this->limit);
             }
             $result = $query->execute();
-        }
-        else {
+        } else {
             $result = parent::getEntityIds();
         }
         return $result;

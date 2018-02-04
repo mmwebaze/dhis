@@ -12,36 +12,39 @@ use Drupal\Core\Access\AccessResult;
  *
  * @see \Drupal\dhis\Entity\OrganisationUnit.
  */
-class OrganisationUnitAccessControlHandler extends EntityAccessControlHandler {
+class OrganisationUnitAccessControlHandler extends EntityAccessControlHandler
+{
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\dhis\Entity\OrganisationUnitInterface $entity */
-    switch ($operation) {
-      case 'view':
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished organisation unit entities');
+    /**
+     * {@inheritdoc}
+     */
+    protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account)
+    {
+        /** @var \Drupal\dhis\Entity\OrganisationUnitInterface $entity */
+        switch ($operation) {
+            case 'view':
+                if (!$entity->isPublished()) {
+                    return AccessResult::allowedIfHasPermission($account, 'view unpublished organisation unit entities');
+                }
+                return AccessResult::allowedIfHasPermission($account, 'view published organisation unit entities');
+
+            case 'update':
+                return AccessResult::allowedIfHasPermission($account, 'edit organisation unit entities');
+
+            case 'delete':
+                return AccessResult::allowedIfHasPermission($account, 'delete organisation unit entities');
         }
-        return AccessResult::allowedIfHasPermission($account, 'view published organisation unit entities');
 
-      case 'update':
-        return AccessResult::allowedIfHasPermission($account, 'edit organisation unit entities');
-
-      case 'delete':
-        return AccessResult::allowedIfHasPermission($account, 'delete organisation unit entities');
+        // Unknown operation, no opinion.
+        return AccessResult::neutral();
     }
 
-    // Unknown operation, no opinion.
-    return AccessResult::neutral();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'add organisation unit entities');
-  }
+    /**
+     * {@inheritdoc}
+     */
+    protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL)
+    {
+        return AccessResult::allowedIfHasPermission($account, 'add organisation unit entities');
+    }
 
 }

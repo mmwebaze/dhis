@@ -3,7 +3,8 @@
 /**
  * Implements hook_drush_command().
  */
-function dhis_drush_command(){
+function dhis_drush_command()
+{
     $items = array();
     $items['dhis-remove-entities'] = [
         'description' => 'Removes dhis2 entities (data elements, Org units)',
@@ -21,28 +22,26 @@ function dhis_drush_command(){
     return $items;
 }
 
-function drush_dhis_remove_entities($arg = NULL){
+function drush_dhis_remove_entities($arg = NULL)
+{
     $tokens = ['@arg' => $arg];
     $dhisService = \Drupal::service("dhis_service");
 
-    switch ($arg){
+    switch ($arg) {
         case 'dx':
-            print('Deleting '.$arg);
+            print('Deleting ' . $arg);
             $dhisService->removeDhisEntities('data_element');
             break;
         case 'ou':
-            print('Deleting '.$arg);
+            print('Deleting ' . $arg);
             $dhisService->removeDhisEntities('organisation_unit');
             break;
         case 'all':
-            print('Deleting '.$arg);
+            print('Deleting ' . $arg);
             $dhisService->removeDhisEntities('data_element');
             $dhisService->removeDhisEntities('organisation_unit');
             break;
         default:
-            $dhisService = \Drupal::service("dhis_service");
-            $dhisService->createTerm('2016');
-
-            drush_print(dt('Wrong argument \''.$arg.'\'. Possible arguments: dx, ou or all.'));
+            drush_print(dt('Wrong argument \'' . $arg . '\'. Possible arguments: dx, ou or all.'));
     }
 }

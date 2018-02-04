@@ -7,13 +7,16 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
-class DataElementFilterForm extends FormBase{
-    public function getFormId() {
+class DataElementFilterForm extends FormBase
+{
+    public function getFormId()
+    {
 
         return 'DataElementFilterForm';
     }
 
-    public function buildForm(array $form, FormStateInterface $form_state) {
+    public function buildForm(array $form, FormStateInterface $form_state)
+    {
         $form = array();
         $form['#attached']['library'][] = 'dhis/dhis_dhis';
         $form['filters']['name'] = array(
@@ -32,7 +35,9 @@ class DataElementFilterForm extends FormBase{
 
         return $form;
     }
-    public function submitForm(array &$form, FormStateInterface $form_state) {
+
+    public function submitForm(array &$form, FormStateInterface $form_state)
+    {
         $form_values = $form_state->getValues();
         $params = array('name' => $form_values['name'], 'form_id' => $form_values['form_id']);
         $form_state->setRedirect('entity.data_element.collection', $params);

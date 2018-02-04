@@ -1,4 +1,5 @@
 <?php
+
 use Symfony\Component\Yaml\Yaml;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
@@ -15,9 +16,10 @@ use Drupal\field\Entity\FieldStorageConfig;
 /**
  * Implements hook_install.
  */
-function dhis_install(){
+function dhis_install()
+{
     $module_path = drupal_get_path('module', 'dhis');
-    $file_contents = file_get_contents($module_path.'/dhis.periods.yml');
+    $file_contents = file_get_contents($module_path . '/dhis.periods.yml');
     $periods = Yaml::parse($file_contents);
 
     $vid = 'periods';
@@ -28,7 +30,7 @@ function dhis_install(){
             'entity_type' => 'taxonomy_term',
             'type' => 'boolean',
             'settings' => [
-                'max_length' =>'1',
+                'max_length' => '1',
             ],
             'cardinality' => 1,
         )
@@ -45,7 +47,7 @@ function dhis_install(){
         ]
     ])->save();
 
-    foreach ($periods['dhis.periods'] as $key => $value){
+    foreach ($periods['dhis.periods'] as $key => $value) {
         Term::create([
             'name' => $key,
             'vid' => $vid,
@@ -57,47 +59,49 @@ function dhis_install(){
 /**
  * Implements hook_uninstall.
  */
-function dhis_uninstall(){
+function dhis_uninstall()
+{
     print('Starting uninstall process');
     $entities = ['data_element', 'organisation_unit', 'periods'];
-    foreach($entities as $entity){
+    foreach ($entities as $entity) {
         $vids = [];
-        try{
-            if ($entity == 'data_element'){
+        try {
+            if ($entity == 'data_element') {
                 $vids = DataElement::loadMultiple();
                 deleteCustomEntity($entity, $vids);
             }
-            if ($entity == 'organisation_unit'){
+            if ($entity == 'organisation_unit') {
                 $vids = OrganisationUnit::loadMultiple();
                 deleteCustomEntity($entity, $vids);
             }
-        }
-        catch(\Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException $e){
+        } catch (\Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException $e) {
             print($e->getMessage());
         }
 
-        if ($entity == 'periods'){
+        if ($entity == 'periods') {
             deleteVocabulary($entity);
         }
     }
     $entity_settings = ['OrganisationUnit_settings', 'DataElement_settings',
-        'field.storage.node.value','field.field.node.dhis_data.value',
-        'field.storage.node.data_source','field.field.node.dhis_data.data_source'];
+        'field.storage.node.value', 'field.field.node.dhis_data.value',
+        'field.storage.node.data_source', 'field.field.node.dhis_data.data_source'];
 
-    foreach($entity_settings as $entity_setting){
+    foreach ($entity_settings as $entity_setting) {
         \Drupal::configFactory()->getEditable($entity_setting)->delete();
     }
 }
 
-function deleteVocabulary($vid) {
+function deleteVocabulary($vid)
+{
     $vocab = Vocabulary::load($vid);
     if ($vocab) {
         $vocab->delete();
     }
 }
 
-function deleteCustomEntity($entity, $vids){
-    if ($vids){
+function deleteCustomEntity($entity, $vids)
+{
+    if ($vids) {
         \Drupal::entityTypeManager()->getStorage($entity)->delete($vids);
     }
 }

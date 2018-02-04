@@ -3,6 +3,7 @@
 namespace Drupal\dhis\Services;
 
 
-interface AnalyticServiceInterface {
-  public function generateAnalytics(array $dataElements, array $orgUnits, array $periods);
+interface AnalyticServiceInterface
+{
+    public function generateAnalytics(array $dataElements, array $orgUnits, array $periods);
 }

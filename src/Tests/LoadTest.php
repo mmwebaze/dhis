@@ -10,37 +10,40 @@ use Drupal\simpletest\WebTestBase;
  *
  * @group dhis
  */
-class LoadTest extends WebTestBase{
+class LoadTest extends WebTestBase
+{
 
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = ['dhis'];
+    /**
+     * Modules to enable.
+     *
+     * @var array
+     */
+    public static $modules = ['dhis'];
 
-  /**
-   * A user with permission to administer site configuration.
-   *
-   * @var \Drupal\user\UserInterface
-   */
-  protected $user;
+    /**
+     * A user with permission to administer site configuration.
+     *
+     * @var \Drupal\user\UserInterface
+     */
+    protected $user;
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-    $this->user = $this->drupalCreateUser(['administer site configuration']);
-    $this->drupalLogin($this->user);
-  }
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->user = $this->drupalCreateUser(['administer site configuration']);
+        $this->drupalLogin($this->user);
+    }
 
-  /**
-   * Tests that the home page loads with a 200 response.
-   */
-  public function testLoad() {
-    $this->drupalGet(Url::fromRoute('<front>'));
-    $this->assertResponse(200);
-  }
+    /**
+     * Tests that the home page loads with a 200 response.
+     */
+    public function testLoad()
+    {
+        $this->drupalGet(Url::fromRoute('<front>'));
+        $this->assertResponse(200);
+    }
 
 }

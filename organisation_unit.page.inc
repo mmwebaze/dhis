@@ -19,12 +19,13 @@ use Drupal\Core\Render\Element;
  *   - elements: An associative array containing the user information and any
  *   - attributes: HTML attributes for the containing element.
  */
-function template_preprocess_organisation_unit(array &$variables) {
-  // Fetch OrganisationUnit Entity Object.
-  $organisation_unit = $variables['elements']['#organisation_unit'];
+function template_preprocess_organisation_unit(array &$variables)
+{
+    // Fetch OrganisationUnit Entity Object.
+    $organisation_unit = $variables['elements']['#organisation_unit'];
 
-  // Helpful $content variable for templates.
-  foreach (Element::children($variables['elements']) as $key) {
-    $variables['content'][$key] = $variables['elements'][$key];
-  }
+    // Helpful $content variable for templates.
+    foreach (Element::children($variables['elements']) as $key) {
+        $variables['content'][$key] = $variables['elements'][$key];
+    }
 }

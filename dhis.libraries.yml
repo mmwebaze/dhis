@@ -7,6 +7,12 @@ dhis_dhis:
   dependencies:
       - core/jquery
 
+dhis_settings:
+  js:
+    js/dhis.js: {}
+  dependencies:
+    - core/jquery
+
 toolbar:
   version: VERSION
   css:
