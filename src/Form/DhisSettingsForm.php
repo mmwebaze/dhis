@@ -7,11 +7,28 @@
 
 namespace Drupal\dhis\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\dhis\Services\DhisUserServiceInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DhisSettingsForm extends ConfigFormBase
 {
+    protected $dhisUserService;
+
+    public function __construct(ConfigFactoryInterface $config_factory, DhisUserServiceInterface $dhisUserService)
+    {
+        parent::__construct($config_factory);
+        $this->dhisUserService = $dhisUserService;
+
+    }
+    public static function create(ContainerInterface $container){
+        return new static(
+            $container->get('config.factory'),
+            $container->get('dhis_user')
+        );
+    }
     /*
      * {@inheritdoc}
      */
@@ -34,7 +51,7 @@ class DhisSettingsForm extends ConfigFormBase
     public function buildForm(array $form, FormStateInterface $form_state)
     {
         $form = parent::buildForm($form, $form_state);
-        //$form['#attached']['library'][] = 'dhis/dhis_settings';
+       // $form['#attached']['library'][] = 'dhis/dhis_settings';
         $config = $this->config('dhis.settings');
         $form['dhis'] = array(
             '#type' => 'fieldset',
@@ -45,6 +62,7 @@ class DhisSettingsForm extends ConfigFormBase
             '#type' => 'textfield',
             '#title' => $this->t('DHIS 2 Link'),
             '#default_value' => $config->get('dhis.link'),
+            '#attributes' => array('id' => array('dhis-base-url')),
             '#required' => TRUE,
         );
 
@@ -63,6 +81,7 @@ class DhisSettingsForm extends ConfigFormBase
             '#type' => 'textfield',
             '#title' => $this->t('DHIS 2 Username'),
             '#default_value' => $config->get('dhis.username'),
+            '#attributes' => array('id' => array('dhis-username')),
             '#required' => TRUE,
         );
 
@@ -70,6 +89,7 @@ class DhisSettingsForm extends ConfigFormBase
             '#type' => 'password',
             '#title' => $this->t('DHIS 2 Password'),
             '#default_value' => $config->get('dhis.password'),
+            '#attributes' => array('id' => array('dhis-password')),
             '#required' => TRUE,
         );
         $form['sync'] = array(
@@ -121,6 +141,22 @@ class DhisSettingsForm extends ConfigFormBase
             '#default_value' => $config->get('dhis.indicators'),
         );
         return $form;
+    }
+    /*
+     * {@inheritdoc}
+     */
+    public function validateForm (array &$form, FormStateInterface $form_state) {
+
+        $credentials['baseUrl'] = $form_state->getValue('link');
+        $credentials['username'] = $form_state->getValue('username');
+        $credentials['password'] = $form_state->getValue('password');
+        $meResponse = $this->dhisUserService->me($credentials);
+        if(!$meResponse){
+            //print_r($meResponse);die('invalid url or usename or password');
+            $form_state->setErrorByName('link', $this->t('Check for valid base url link.'));
+            $form_state->setErrorByName('username', $this->t('Check for valid username.'));
+            $form_state->setErrorByName('password', $this->t('Check for valid password.'));
+        }
     }
 
     /*

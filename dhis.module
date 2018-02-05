@@ -10,8 +10,8 @@ use Drupal\dhis\Entity\DataElement;
 
 use Drupal\Core\Routing\RouteMatchInterface;
 
-//define("MONTHLY", 2592000);
-define("MONTHLY", 60); //for testing purposes only...to be removed and replaced by line 13 above
+define("MONTHLY", 2592000);
+//define("MONTHLY", 60); //for testing purposes only...to be removed and replaced by line 13 above
 
 
 /**

@@ -4,7 +4,6 @@ namespace Drupal\dhis\Form;
 
 
 use Drupal\Core\Config\ConfigFactory;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\dhis\Entity\OrganisationUnit;
@@ -18,7 +17,7 @@ use Drupal\Core\File\FileSystem;
 use \Drupal\dhis\Util\CsvHandler;
 use Drupal\Core\Entity\EntityTypeManager;
 
-class MetadataExtractForm extends FormBase implements ContainerInjectionInterface
+class MetadataExtractForm extends FormBase
 {
     protected $config_factory;
     private $content;

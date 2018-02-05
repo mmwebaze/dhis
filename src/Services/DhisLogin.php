@@ -8,6 +8,7 @@ namespace Drupal\dhis\Services;
 
 use Drupal\Core\Config\ConfigFactory;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\TooManyRedirectsException;
 
 class DhisLogin implements LoginService
 {
@@ -46,5 +47,19 @@ class DhisLogin implements LoginService
     {
 
         return $this->isSessionAlive;
+    }
+    public function testLogin(array $credentials){
+        $this->baseUrl = $credentials['baseUrl'];
+        $this->username = $credentials['username'];
+        $this->password = $credentials['password'];
+        try{
+            $this->login('me');
+            return TRUE;
+        }
+        catch(TooManyRedirectsException $e){
+
+            return FALSE;
+        }
+
     }
 }
