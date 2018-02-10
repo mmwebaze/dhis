@@ -120,6 +120,11 @@ class DhisSettingsForm extends ConfigFormBase
             '#type' => 'fieldset',
             '#title' => $this->t('DHIS 2 Metadata to import'),
         );
+        $form['metadata']['metadata_delete'] = array(
+            '#type' => 'checkbox',
+            '#title' => $this->t('Delete any existing meta data before next fetch.'),
+            '#default_value' => $config->get('dhis.metadata_delete'),
+        );
         $form['metadata']['orgUnitGrp'] = array(
             '#type' => 'checkbox',
             '#title' => $this->t('Organisation Unit Groups'),
@@ -175,6 +180,7 @@ class DhisSettingsForm extends ConfigFormBase
         $config->set('dhis.orgUnits', $form_state->getValue('orgUnits'));
         $config->set('dhis.dataElements', $form_state->getValue('dataElements'));
         $config->set('dhis.indicators', $form_state->getValue('indicators'));
+        $config->set('dhis.metadata_delete', $form_state->getValue('metadata_delete'));
         $config->save();
         return parent::submitForm($form, $form_state);
     }

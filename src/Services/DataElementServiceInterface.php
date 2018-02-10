@@ -6,7 +6,7 @@ interface DataElementServiceInterface
 {
     public function getDataElementByCode($code, $format);
 
-    public function getDataElements($isPaginated, $format);
+    public function getDataElements($isPaginated = TRUE, $format = "JSON");
 
     public function getDatasetDataElements($datasetCode, $isPaginated, $format);
 

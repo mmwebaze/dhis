@@ -10,7 +10,7 @@ interface OrgUnitServiceInterface
 {
     public function getOrgUnitByCode($code, $format);
 
-    public function getOrgUnits($isPaginated, $format);
+    public function getOrgUnits($isPaginated = TRUE, $format = "JSON");
 
     public function getOrgUnitsByLevel($level, $isPaginated, $format);
 

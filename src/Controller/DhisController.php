@@ -7,6 +7,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\dhis\Entity\OrganisationUnit;
 use Drupal\dhis\Entity\DataElement;
+use Drupal\dhis\Exceptions\MissingDimensionsException;
 use Drupal\dhis\Services\DhisService;
 use Drupal\dhis\Util\ArrayUtil;
 use Drupal\taxonomy\Entity\Vocabulary;
@@ -18,7 +19,7 @@ use \Drupal\dhis\Util\CsvHandler;
 use Drupal\Core\File\FileSystem;
 use Drupal\Core\Path\CurrentPathStack;
 
-class DhisController extends ControllerBase implements ContainerInjectionInterface
+class DhisController extends ControllerBase
 {
 
     protected $dhis_service;
@@ -68,10 +69,27 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
 
     public function generateAnalytics(Request $request)
     {
+        $element = [
+            '#theme' => 'dhis',
+            '#test_var' => 'ghj',
+        ];
 
         $dx = $this->dhis_service->getDimensions('data_element');
         $ou = $this->dhis_service->getDimensions('organisation_unit');
         $pe = $this->dhis_service->getDimensions('taxonomy_term');
+
+        try{
+            if(empty($dx) || empty($ou) || empty($pe)){
+                $dimensions['dx'] = $dx;
+                $dimensions['ou'] = $ou;
+                $dimensions['pe'] = $pe;
+                throw new MissingDimensionsException('', 0, null, $dimensions);
+            }
+        }
+        catch (MissingDimensionsException $e){
+            drupal_set_message($e->errorMessage(), 'error');
+            return $element;
+        }
 
         $analyticsData = $this->dhis_analytics->generateAnalytics($dx, $ou, $pe);
 
@@ -102,11 +120,8 @@ class DhisController extends ControllerBase implements ContainerInjectionInterfa
 
         $this->content['table'] = $output;
         $this->content['url'] = '/sites/default/files/data.csv';
+        $element['#test_var'] = $this->content;
 
-        $element = [
-            '#theme' => 'dhis',
-            '#test_var' => $this->content,
-        ];
         return $element;
     }
 

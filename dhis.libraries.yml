@@ -5,11 +5,20 @@ dhis_dhis:
   js:
     js/dhis.js: {}
   dependencies:
-      - core/jquery
+    - core/jquery
 
 dhis_settings:
   js:
     js/dhis.js: {}
+  dependencies:
+    - core/jquery
+
+dhis_fetch_metadata:
+  css:
+    theme:
+      css/dhis-metadata.css: {}
+  js:
+    js/dhis-metadata.js: {}
   dependencies:
     - core/jquery
 

@@ -2,11 +2,12 @@
 
 namespace Drupal\dhis\Services;
 
-
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\dhis\Util\ArrayUtil;
+use Drupal\dhis\Entity\OrganisationUnit;
+use Drupal\dhis\Entity\DataElement;
 
 class DhisService implements DhisServiceInterface
 {
@@ -57,9 +58,9 @@ class DhisService implements DhisServiceInterface
         return $dimensions;
     }
 
-    public function removeDhisEntities($entity_type)
-        {
-            $storage = $this->entity_manager->getStorage($entity_type);
+    public function removeDhisEntities($entity_type){
+
+        $storage = $this->entity_manager->getStorage($entity_type);
         $ids = $storage->getQuery()->execute();
         $entities = $storage->loadMultiple($ids);
 
@@ -158,5 +159,53 @@ class DhisService implements DhisServiceInterface
             return current($terms)->id();
         }
         return current($terms)->id();
+    }
+    public function checkDhisEntities($entityType){
+        $storage = $this->entity_manager->getStorage($entityType);
+        $ids = $storage->getQuery()->execute();
+        $entities = $storage->loadMultiple($ids);
+        $numberEntities = count($entities);
+        if ($numberEntities > 0){
+            return ['hasEntities' => TRUE, 'count' => $numberEntities];
+        }
+        return ['hasEntities' => FALSE, 'count' => $numberEntities];
+    }
+    public function createDhisEntities($metadata, $entity_type, $list = [])
+    {
+        if ($entity_type == 'organisationunit') {
+            foreach ($metadata as $item) {
+                if (count($list) == 0) {
+                    $this->createOrganisationUnitEntity($item);
+                } else {
+                    if (in_array($item['id'], $list)) {
+                        $this->createOrganisationUnitEntity($item);
+                    }
+                }
+            }
+        } elseif ($entity_type == 'dataelement') {
+            //drupal_set_message(json_encode($metadata, 1));
+            foreach ($metadata as $item) {
+                if (count($list) == 0) {
+                    $this->createDataElementEntity($item);
+                } else {
+                    if (in_array($item['id'], $list)) {
+                        $this->createDataElementEntity($item);
+                    }
+                }
+            }
+        } else {
+            //add indicators
+        }
+    }
+    private function createDataElementEntity($item)
+    {
+        DataElement::create(['name' => $item['displayName'],
+            'deuid' => $item['id']])->save();
+    }
+
+    private function createOrganisationUnitEntity($item)
+    {
+        OrganisationUnit::create(['name' => $item['displayName'],
+            'orgunituid' => $item['id']])->save();
     }
 }

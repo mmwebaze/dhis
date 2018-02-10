@@ -12,4 +12,6 @@ interface DhisServiceInterface
     public function createContent($dhis_data);
 
     public function analyticData($analyticsData);
+    public function checkDhisEntities($entityType);
+    public function createDhisEntities($metadata, $entity_type, $list = []);
 }

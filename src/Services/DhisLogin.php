@@ -31,7 +31,7 @@ class DhisLogin implements LoginService
     public function login($url)
     {
         $client = new Client();
-        $response = $client->request('GET', $this->baseUrl . $url, ['auth' => [$this->username, $this->password]]);
+        $response = $client->request('GET', $this->baseUrl . $url, ['auth' => [$this->username, $this->password, 'basic']]);
         return json_decode($response->getBody()->getContents(), true);
     }
 
