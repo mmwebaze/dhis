@@ -1,3 +1,19 @@
+#reporttable:
+#  js:
+#    js/ext-all.js: {}
+#    js/chart.js: {}
+#  dependencies:
+#    - core/drupal
+
+#dhis_plugins:
+  #css:
+  #  theme:
+  #    css/ext-plugin-gray.css: {}
+#  js:
+#    js/pivot_table.js: {}
+#  dependencies:
+#    - dhis/reporttable
+
 dhis_dhis:
   css:
     theme:

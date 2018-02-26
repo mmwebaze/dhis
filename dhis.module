@@ -41,6 +41,10 @@ function dhis_theme($existing, $type, $theme, $path)
             'template' => 'dhis',
             'variables' => array('test_var' => NULL),
         ],
+        'dhis_visualization' => [
+            'template' => 'dhis_visualization',
+            'variables' => array('dhis_viz_vars' => NULL),
+        ],
     ];
 }
 

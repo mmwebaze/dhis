@@ -1,4 +1,8 @@
 services:
+  dhis.cookie:
+    class: Drupal\dhis\Services\DhisCookieService
+    arguments: []
+
   dhis.dhis_login:
     class: Drupal\dhis\Services\DhisLogin
     arguments: ['@config.factory']
@@ -22,3 +26,7 @@ services:
   dhis_user:
     class: Drupal\dhis\Services\DhisUserService
     arguments: ['@dhis.dhis_login']
+
+  dhis_visualization:
+    class: Drupal\dhis\Services\DhisVisualizationService
+    arguments: ['@dhis.dhis_login', '@dhis.cookie']

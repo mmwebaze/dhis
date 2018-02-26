@@ -3,37 +3,34 @@
 namespace Drupal\dhis\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Entity\EntityTypeManager;
-use Drupal\dhis\Entity\OrganisationUnit;
-use Drupal\dhis\Entity\DataElement;
-use Drupal\dhis\Exceptions\MissingDimensionsException;
-use Drupal\dhis\Services\DhisService;
-use Drupal\dhis\Util\ArrayUtil;
-use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\dhis\Services\AnalyticService;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use \Drupal\dhis\Util\CsvHandler;
 use Drupal\Core\File\FileSystem;
 use Drupal\Core\Path\CurrentPathStack;
+use Drupal\dhis\Exceptions\MissingDimensionsException;
+use Drupal\dhis\Services\AnalyticService;
+use Drupal\dhis\Services\DhisService;
+use Drupal\dhis\Services\DhisVisualizationServiceInterface;
+use Drupal\dhis\Util\CsvHandler;
+use Drupal\dhis\Visualizations\PivotTable;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class DhisController extends ControllerBase
 {
-
     protected $dhis_service;
     private $content = [];
-    private $dhis_analytics;
+    protected $dhis_analytics;
     private $file_system;
     private $path_current;
+    protected $dhisVisualizationService;
 
-    public function __construct(DhisService $dhis_service, AnalyticService $dhis_analytics, FileSystem $file_system, CurrentPathStack $path_current)
+    public function __construct(DhisService $dhis_service, AnalyticService $dhis_analytics, FileSystem $file_system,
+                                CurrentPathStack $path_current, DhisVisualizationServiceInterface $dhisVisualizationService)
     {
         $this->dhis_service = $dhis_service;
         $this->dhis_analytics = $dhis_analytics;
         $this->file_system = $file_system;
         $this->path_current = $path_current;
+        $this->dhisVisualizationService = $dhisVisualizationService;
     }
 
     public function display()
@@ -71,7 +68,7 @@ class DhisController extends ControllerBase
     {
         $element = [
             '#theme' => 'dhis',
-            '#test_var' => 'ghj',
+            '#test_var' => '',
         ];
 
         $dx = $this->dhis_service->getDimensions('data_element');
@@ -87,6 +84,7 @@ class DhisController extends ControllerBase
             }
         }
         catch (MissingDimensionsException $e){
+            $element['#test_var'] = $e->errorMessage();
             drupal_set_message($e->errorMessage(), 'error');
             return $element;
         }
@@ -124,14 +122,33 @@ class DhisController extends ControllerBase
 
         return $element;
     }
+    public function dhisPivotPluginDemo(){
+        $this->dhisVisualizationService->getPivotTable('Hey');
+        $el = 'table1';
+        $pivotTable = new PivotTable();
+        //$pivotTable->setUrl('https://dhis2.jsi.com/mfl/');
+        $pivotTable->setEl($el);
+        $pivotTable->setId('C0rhAq1oklh');
+        //var table1 = {id: 'C0rhAq1oklh', el: 'table1'};
 
+        $element = [
+            '#theme' => 'dhis_visualization',
+            '#dhis_viz_vars' => ['id' => $el, 'vizual' => json_encode($pivotTable)],
+            '#attached' => array(
+                'library' => array('dhis/dhis_plugins'),
+            )
+        ];
+        //print_r($_SESSION);
+        return $element;
+    }
     public static function create(ContainerInterface $container)
     {
         return new static(
             $container->get('dhis_service'),
             $container->get('dhis_analytics'),
             $container->get('file_system'),
-            $container->get('path.current')
+            $container->get('path.current'),
+            $container->get('dhis_visualization')
         );
     }
 }

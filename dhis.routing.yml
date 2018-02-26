@@ -49,3 +49,11 @@ dhis.admin_dhis:
     _title: 'Dhis'
   requirements:
     _permission: 'access dhis administration pages'
+
+dhis.visualization_plugin:
+  path: '/dhis/plugin'
+  defaults:
+    _controller: '\Drupal\dhis\Controller\DhisController::dhisPivotPluginDemo'
+    _title: 'Testing DHIS Plugins'
+  requirements:
+    _permission: 'access content'

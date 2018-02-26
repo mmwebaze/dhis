@@ -13,11 +13,13 @@ use GuzzleHttp\Exception\TooManyRedirectsException;
 class DhisLogin implements LoginService
 {
 
-    private $header = array();
-    private $username;
-    private $password;
-    private $isSessionAlive = FALSE;
-    private $baseUrl;
+    protected $header = array();
+    protected $username;
+    protected $password;
+    protected $isSessionAlive = FALSE;
+    protected $httpClient;
+    protected $baseUrl;
+    //protected $dhisCookieService;
 
     public function __construct(ConfigFactory $config_factory)
     {
@@ -25,13 +27,15 @@ class DhisLogin implements LoginService
         $this->username = $config->get('dhis.username');
         $this->password = $config->get('dhis.password');
         $this->baseUrl = $config->get('dhis.link');
+       // $this->dhisCookieService = $dhisCookieService;
+        $this->httpClient = new Client();
     }
 
 
     public function login($url)
     {
-        $client = new Client();
-        $response = $client->request('GET', $this->baseUrl . $url, ['auth' => [$this->username, $this->password, 'basic']]);
+        //$client = new Client();
+        $response = $this->httpClient->request('GET', $this->baseUrl . $url, ['auth' => [$this->username, $this->password, 'basic']]);
         return json_decode($response->getBody()->getContents(), true);
     }
 
@@ -60,6 +64,23 @@ class DhisLogin implements LoginService
 
             return FALSE;
         }
+
+    }
+    public function loginWithCookie($cookie){
+        $base = "https://dhis2.jsi.com/mfl/";
+        //$url = $this->baseUrl.'Login';//?loginName='.$this->username.'&password='.$this->password;
+        $url = $base .  "dhis-web-commons-security/login.action";
+        $response = $this->httpClient->request('POST', $url, [
+            'form_params' => [
+                'loginName' => $this->username,
+                'password' => $this->password
+            ],
+            'cookies' => $cookie
+        ]);
+
+        //print_r($response->getStatusCode());
+    }
+    public function cookieLoginStatus($cookie){
 
     }
 }
